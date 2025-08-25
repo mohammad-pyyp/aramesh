@@ -68,3 +68,6 @@ class ReserveTemplateView(TemplateView):
 class CommingSoonTemplateView(TemplateView):
     template_name = "comming_soon.html"
 
+
+class ManagementResevrveTemplateView(TemplateView):
+    template_name = "management/reserve.html"
