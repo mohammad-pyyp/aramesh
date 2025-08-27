@@ -39,7 +39,7 @@ class CommingSoonTemplateView(TemplateView):
 
 
 class ManagementAappointmentsTemplateView(TemplateView):
-    template_name = "management\management_appointments.html"
+    template_name = "management/management_appointments.html"
 
 
 
