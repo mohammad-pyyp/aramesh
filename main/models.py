@@ -72,7 +72,7 @@ class Appointment(models.Model):
     class Meta :
         verbose_name = 'رزرو'
         verbose_name_plural= "رزروها"
-        ordering = ("-created_at",)
+        # ordering = ("-created_at",)
 
     def __str__(self):
         return f"{self.profile_fullname} - {self.date} {self.time}"

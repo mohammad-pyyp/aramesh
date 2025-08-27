@@ -4,14 +4,12 @@ from . import views
 
 app_name = 'main'
 
-
-
 urlpatterns = [
-    path('', views.ReserveTemplateView.as_view() , name="reserve"),
-    path('api/submit_reserve_form/', views.submit_reserve_form, name='submit_reserve_form'),
-    path('co_so/', views.CommingSoonTemplateView.as_view() , name="co_so"),
-    path('manage/', views.ManagementResevrveTemplateView.as_view() , name="manage"),
-
+    path('', views.WelcomePage.as_view(),name="welcome_page" ),
+    path('user_dashboard/', views.UserDashboardTemplateView.as_view(), name="user_dashboard" ),
+    path('comming_soon/', views.CommingSoonTemplateView.as_view(), name="co_so" ),
+    path('ma/', views.ManagementAappointmentsTemplateView.as_view(), name="MA" ),
+    
 
 ]
 

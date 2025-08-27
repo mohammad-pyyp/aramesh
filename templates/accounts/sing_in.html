@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-    <script defer  src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js"></script>
+    <script src="{% static 'js/pkgs/axios.min.js' %}"></script>
+    <script defer  src="{% static 'js\pkgs\alpine.min.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <title>Reserve</title>
+    <title>Sing-in</title>
 
 </head>
 
@@ -14,7 +14,7 @@
     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
     <h1 x-text="message"></h1>
     <div class="form-container" x-data="formData">
-        <div class="form-title"> رزرو نوبت </div>
+        <div class="form-title"> Sign-in </div>
 
         <!-- Step Indicator -->
         <div class="step-indicator">
@@ -96,38 +96,8 @@
             </div>
         </div>
 
-        <!-- Step 4: Success -->
-        <div x-show="step === 4" class="success-message fade-in" style="display: none;">
-            <div class="success-icon">
-                <svg width="40" height="40" fill="white" viewBox="0 0 16 16">
-                    <path
-                        d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z">
-                    </path>
-                </svg>
-            </div>
-            <h2 style="color: var(--success-color); margin-bottom: 15px;">ثبت شد!</h2>
-            <p style="color: #666; font-size: 16px; line-height: 1.6;">
-                فرم شما با موفقیت ارسال شد.<br>
-                اطلاعات شما ثبت گردید.
-            </p>
-            <p style="color: #666; font-size: 16px; line-height: 1.6;">
-                به زوری با شما تماس خواهیم گرفت . . .
-            </p>
-            <div
-                style="margin-block: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px; text-align: right;">
-                <h3 style="color: #333; margin-bottom: 15px;">اطلاعات ثبت شده:</h3>
-                <p><strong>نام:</strong> <span x-text="firstName"></span></p>
-                <p><strong>نام خانوادگی:</strong> <span x-text="lastName"></span></p>
-                <p><strong>شماره تلفن:</strong> <span x-text="phoneNumber"></span></p>
-                <p><strong>ابجد اسم:</strong> <span x-text="abjad"></span></p>
-
-            </div>
-            <button><a href="{% url 'main:co_so' %}">فروشگاه</a></button>
-        </div>
     </div>
 
-
-
-    <script src="{% static 'js/script.js' %}"></script>
+    <script src="{% static 'js/sing_in.js' %}"></script>
 
 </body>

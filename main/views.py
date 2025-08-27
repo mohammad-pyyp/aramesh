@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView 
-from .models import Reserve
+# from .models import Reserve
 import json
 
 
@@ -23,51 +23,69 @@ def abjad_value(text):
             total += abjad_dict[char]
     return total
 
-@csrf_exempt
-def submit_reserve_form(request):
-    if request.method == 'POST':
-        # Depending on content-type, parse body accordingly:
-        if request.content_type == 'application/json':
-            data = json.loads(request.body)
-        else:
-            data = request.POST
-        
-        first_name = data.get('firstName')
-        last_name = data.get('lastName')
-        phone_number = data.get('phoneNumber')
-        
-        if first_name and last_name and phone_number :
-            obj = Reserve.objects.create(
-                                         first_name=first_name ,
-                                         last_name=last_name ,
-                                         phone_number=phone_number,
-                                        )
-            obj.save()
-            
-            return JsonResponse({
-                'message': "Ok I'm Mohammad Wlcome to my site!" ,
-                'status': "ok" ,
-                'abjad': abjad_value(first_name) ,
-            })
-
-    return JsonResponse({'error': 'فرم نا معتبر'}, status=400)
 
 
 
+class WelcomePage(TemplateView):
+    template_name = 'welcome_page.html'
 
 
-
-
-
-
-
-class ReserveTemplateView(TemplateView):
-    template_name = "main/reserve.html"
+class UserDashboardTemplateView(TemplateView):
+    template_name = "user_dashboard.html"
 
 
 class CommingSoonTemplateView(TemplateView):
     template_name = "comming_soon.html"
 
 
-class ManagementResevrveTemplateView(TemplateView):
-    template_name = "management/reserve.html"
+class ManagementAappointmentsTemplateView(TemplateView):
+    template_name = "management\management_appointments.html"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# @csrf_exempt
+# def submit_reserve_form(request):
+#     if request.method == 'POST':
+#         # Depending on content-type, parse body accordingly:
+#         if request.content_type == 'application/json':
+#             data = json.loads(request.body)
+#         else:
+#             data = request.POST
+        
+#         first_name = data.get('firstName')
+#         last_name = data.get('lastName')
+#         phone_number = data.get('phoneNumber')
+        
+#         if first_name and last_name and phone_number :
+#             obj = Reserve.objects.create(
+#                                          first_name=first_name ,
+#                                          last_name=last_name ,
+#                                          phone_number=phone_number,
+#                                         )
+#             obj.save()
+            
+#             return JsonResponse({
+#                 'message': "Ok I'm Mohammad Wlcome to my site!" ,
+#                 'status': "ok" ,
+#                 'abjad': abjad_value(first_name) ,
+#             })
+
+#     return JsonResponse({'error': 'فرم نا معتبر'}, status=400)
+
+
+

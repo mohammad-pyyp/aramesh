@@ -1,0 +1,808 @@
+/* ============================== Theme Variables ============================== */
+:root {
+    --accent: #06b6d4;
+    --accent-light: rgba(6, 182, 212, 0.15);
+    --muted: #94a3b8;
+    --bg-card: rgba(255, 255, 255, 0.06);
+    /* --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); */
+    --bg-body: #0f172a;
+
+    --font-main: 'Vazir', sans-serif;
+    --cell-min-height: 50px;
+
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+}
+
+/* ============================== 🛠 Base Styles ============================== */
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* hide pre-render flashes for v-cloak */
+[v-cloak] {
+    display: none;
+}
+
+body {
+    font-family: var(--font-main);
+    background: var(--bg-body);
+    color: #e2e8f0;
+    padding: 12px;
+}
+
+/* prevent text selection during drag */
+body.dragging {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+/* ============================= Calendar Container ============================== */
+.calendar {
+    background: var(--bg-card);
+    padding: 20px;
+    border-radius: 16px;
+    max-width: 720px;
+    margin: auto;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.month {
+    font-size: 18px;
+    color: var(--accent);
+    font-weight: 700;
+    text-align: center;
+}
+
+/* Navigation Buttons */
+button.icon {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button.icon:hover {
+    color: var(--accent);
+    border-color: var(--accent-light);
+}
+
+/* Grid Layout */
+.weekdays,
+.grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.weekdays div {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+/* Calendar Cells */
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    min-height: 55px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 4px;
+    cursor: pointer;
+    transition: background .2s;
+    border: 1px solid #2c2c2c;
+    outline: none;
+}
+
+.cell:focus {
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.12);
+}
+
+.cell:hover {
+    background: rgba(6, 182, 212, 0.07);
+}
+
+.cell.today {
+    border: 1px solid var(--accent-light);
+    background: rgba(6, 182, 212, 0.15);
+}
+
+/* ===== جدید: استایل روزهای گذشته ===== */
+.cell.past {
+    opacity: 0.75;
+    background: rgba(255, 255, 255, 0.01);
+    filter: grayscale(15%);
+}
+
+.cell.past:hover {
+    /* کمتر تاکید روی هاور روز گذشته */
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.cell.past .date {
+    color: var(--muted);
+}
+
+/* نقطه‌ی نوبت برای روز گذشته به رنگ کم‌رنگ‌تر */
+.cell.past .dot {
+    background: #6b7280;
+    /* خاکستری ملایم */
+}
+
+/* ======================================= */
+
+.cell.holiday .date {
+    color: #f87171;
+}
+
+.date {
+    font-size: 1rem;
+}
+
+.dot {
+    margin-top: .25rem;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #06d439;
+    color: #fff;
+    font-size: .7rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+/* Selected Day */
+.selected {
+    border: 1px solid rgba(52, 211, 153, 0.8);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.8);
+    font-weight: bold;
+    transform: scale(1.05);
+    transition: all 0.25s ease-in-out;
+}
+
+
+/* ---------- tabs container ---------- */
+.controls {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.controls .badge {
+    background: orange;
+    border-radius: 50%;
+    color: white;
+    padding: 0 6px;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.appt-card {
+    border: 1px solid #ccc;
+    margin: 4px;
+    padding: 6px;
+    cursor: grab;
+}
+
+.tabs {
+    position: relative;
+    display: inline-flex;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(6px);
+}
+
+/* ---------- each tab ---------- */
+.tab {
+    position: relative;
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    transition: color 220ms cubic-bezier(.2, .9, .2, 1), transform 220ms ease;
+    outline: none;
+    min-width: 128px;
+    text-align: center;
+    z-index: 2;
+    /* above underline */
+}
+
+.tab-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #fbbf24;
+    /* نارنجی */
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 999px;
+    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    line-height: 1;
+}
+
+.tab:hover {
+    color: var(--accent);
+    transform: translateY(-3px);
+}
+
+
+/* active tab text */
+.tab.active {
+    color: var(--accent);
+}
+
+/* ---------- sliding underline (single) ---------- */
+.tab-underline {
+    position: absolute;
+    left: 0;
+    /* will be set by JS */
+    top: 100%;
+    height: 6px;
+    border-radius: 999px;
+    width: 0;
+    /* will be set by JS */
+    margin-top: 10px;
+    z-index: 1;
+    pointer-events: none;
+    /* box-shadow: 0 6px 18px rgba(6, 182, 212, 0.12), 0 2px 6px rgba(52, 211, 153, 0.06); */
+    transition: left 320ms cubic-bezier(.2, .9, .2, 1), width 320ms cubic-bezier(.2, .9, .2, 1), opacity 220ms ease;
+    will-change: left, width;
+    filter: drop-shadow(0 6px 14px rgba(6, 182, 212, 0.06));
+    opacity: 0.98;
+}
+
+/* subtle pulse when tab switches (optional) */
+.tab-underline.pulse {
+    animation: tabPulse 520ms cubic-bezier(.2, .9, .2, 1);
+}
+
+@keyframes tabPulse {
+    0% {
+        transform: scaleX(0.95) translateY(0);
+        opacity: 0.9;
+    }
+
+    40% {
+        transform: scaleX(1.05) translateY(-2px);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleX(1) translateY(0);
+        opacity: 0.98;
+    }
+}
+
+/* responsive */
+@media (max-width:520px) {
+    .tab {
+        padding: 8px 12px;
+        min-width: 90px;
+        font-size: 13px;
+    }
+
+    .tab-underline {
+        height: 4px;
+        margin-top: 8px;
+    }
+}
+
+
+/* Buttons */
+.btn {
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-inactive {
+    background: transparent;
+    color: var(--muted);
+}
+
+/* Data Card */
+.data-card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px;
+    border-radius: 12px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 250px;
+}
+
+th,
+td {
+    padding: 8px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+th {
+    color: var(--accent);
+    text-align: right;
+}
+
+td {
+    color: #dbeafe;
+}
+
+/* Status Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.pending,
+.btn-active-pending {
+    background: #fbbf24;
+    color: #1f2937;
+}
+
+.confirmed,
+.btn-active-confirmed {
+    background: #34d399;
+    color: #06202a;
+}
+
+.cancel,
+.btn-active-cancel {
+    background: #fb7185;
+    color: #1f2937;
+}
+
+
+.draggable-row.dragging {
+    opacity: 0.5;
+    transform: scale(0.98);
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.dragging::after {
+
+    display: block;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #22c55e;
+    margin-top: 4px;
+}
+
+.drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+.disabled-slot {
+    opacity: 0.5;
+    pointer-events: none;
+    /* کاملاً غیرفعال */
+}
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+}
+
+.toast {
+    min-width: 200px;
+    max-width: 320px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    background: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInOut 4s ease forwards;
+}
+
+.toast.success {
+    border-left: 4px solid #2ecc71;
+}
+
+.toast.error {
+    border-left: 4px solid #e74c3c;
+}
+
+.toast.info {
+    border-left: 4px solid #3498db;
+}
+
+.toast.warning {
+    border-left: 4px solid #f39c12;
+}
+
+@keyframes fadeInOut {
+    0% {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    10%,
+    90% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+}
+
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+/* Modal Box */
+.modal {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    color: #eee;
+    padding: 20px;
+    border-radius: 10px;
+    width: 360px;
+    max-width: 90%;
+}
+
+.modal h3 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Textarea */
+.modal textarea {
+    background: rgba(255, 255, 255, 0.08);
+    color: #f9fafb;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    width: 100%;
+    height: 80px;
+    margin: 10px 0 16px;
+    padding: 10px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 13px;
+    resize: none;
+}
+
+.modal textarea::placeholder {
+    color: var(--muted);
+    opacity: 0.8;
+}
+
+/* Actions */
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Buttons */
+.modal-actions .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s, transform 0.15s;
+}
+
+.modal-actions .btn:hover {
+    background: #0891b2;
+    /* accent تیره‌تر */
+    transform: translateY(-1px);
+}
+
+.modal-actions .btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.modal-actions .btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ============================== Responsive ============================== */
+@media (max-width: 560px) {
+    .form-row {
+        flex-direction: column;
+    }
+
+    .weekdays div {
+        font-size: 12px;
+    }
+
+    .cell {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .cell {
+        min-height: 45px;
+    }
+
+    .date {
+        font-size: .85rem;
+    }
+
+    .dot {
+        min-width: 18px;
+        height: 18px;
+        font-size: .65rem;
+    }
+}
+
+
+.card-list {
+    margin-inline: auto;
+    max-width: 720px;
+}
+
+.appointment-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    padding: 16px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+}
+
+.appointment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+
+.card-header {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.card-body {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.card-body p {
+    margin: 4px 0;
+}
+
+.card-body .label {
+    font-weight: 500;
+    color: #ccc;
+    margin-left: 6px;
+}
+
+
+.appointment-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.card-row {
+    align-items: center;
+}
+
+/* handle */
+.card-handle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: grab;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-handle:active {
+    cursor: grabbing;
+    transform: translateY(1px);
+}
+
+/* در حالت hover کمی برجسته‌تر */
+.card-handle:hover {
+    background: rgba(255, 255, 255, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+
+/* لینک کارت */
+.card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    flex: 1 1 auto;
+}
+
+/* handle */
+.card-handle {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: grab;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-handle:active {
+    cursor: grabbing;
+    transform: translateY(1px);
+}
+
+.appointment-card {
+    padding: 12px;
+}
+
+
+
+/* ردیف آیتم (کلیک‌پذیر نیست، خود لینک کلیک‌پذیره) */
+.draggable-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: default;
+}
+
+/* Handle */
+.card-item-handle {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    cursor: grab;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: var(--muted);
+    transition: background .15s, transform .12s;
+}
+
+.card-item-handle:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.card-item-handle:active {
+    cursor: grabbing;
+    transform: translateY(1px);
+}
+
+/* لینک داخل آیتم */
+.item-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    flex: 1 1 auto;
+    outline: none;
+    padding: 4px 0;
+}
+
+.item-link:hover {
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+/* متن muted */
+.draggable-row .muted {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* وقتی در حال درگ روی هندل هست (اختیاری) */
+.card-item-handle.dragging,
+.card-item-handle:active {
+    opacity: 0.9;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+
+/* رنگ بدج مخصوص تب pending / cancel بر اساس data-drop-target */
+.tab[data-drop-target="pending"] .tab-badge {
+    background-color: #fbbf24;
+    /* نارنجی / زرد */
+}
+
+.tab[data-drop-target="cancel"] .tab-badge {
+    background-color: #fb7185;
+    /* قرمز ملایم */
+}

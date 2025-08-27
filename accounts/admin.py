@@ -1,18 +1,24 @@
 from django.contrib import admin
-from . import models
-from jalali_date import datetime2jalali, date2jalali
-from jalali_date.admin import ModelAdminJalaliMixin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
+from .models import User
 
 
-@admin.register(models.Profile)
-class ProfileAdmin(ModelAdminJalaliMixin, admin.ModelAdmin):
-    list_display = ['user', 'first_name', 'last_name', 'phone_number', 'get_created_at_jalali']
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    ordering = ("phone",)
+    list_display = ("phone", "first_name", "last_name", "is_staff", "is_active")
+    search_fields = ("phone", "first_name", "last_name")
 
-    @admin.display(description='تاریخ ایجاد', ordering='created_at')
-    def get_created_at_jalali(self, obj):
-        return datetime2jalali(obj.created_at).strftime('%a, %d %b %Y')
-
-
-@admin.register(models.VerificationCode)
-class VerificationCodeAdmin(admin.ModelAdmin):
-    list_display = ['user', 'code']
+    fieldsets = (
+        (None, {"fields": ("phone", "password")}),
+        (_("اطلاعات شخصی"), {"fields": ("first_name", "last_name")}),
+        (_("دسترسی‌ها"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
+        (_("تاریخ‌ها"), {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": ("phone", "password1", "password2", "is_active", "is_staff", "is_superuser"),
+        }),
+    )

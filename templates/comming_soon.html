@@ -76,8 +76,10 @@
 
     <div class="my_text"></div>
 
-    <a href="/admin" style="background-color: white; padding: 10px; border-radius: 5px; margin-top: 2rem; color: #333; user-select: none; text-decoration: none;">admin</a>
-
+    <div style="display: flex; flex-direction: column;">
+        <a href="{% url 'main:MA' %}" style="background-color: white; padding: 10px; border-radius: 5px; margin-top: 2rem; color: #333; user-select: none; text-decoration: none;">مدیریت نوبت ها</a>
+        <a href="{% url 'main:user_dashboard' %}" style="background-color: white; padding: 10px; border-radius: 5px; margin-top: 2rem; color: #333; user-select: none; text-decoration: none;"> داشبورد کاربر </a>
+    </div>
 </body>
 
 </html>

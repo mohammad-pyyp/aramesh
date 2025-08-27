@@ -30,16 +30,18 @@ INSTALLED_APPS = [
 
 
     # installed apps
-    'django_cleanup.apps.CleanupConfig',
-    'jalali_date',
+    # 'django_cleanup.apps.CleanupConfig',
+    # 'jalali_date',
+
+
     # my apps
-    # 'core',
-    # 'accounts',
 
-
+    'accounts',
     "main",
 
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -98,6 +100,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+]
+
+AUTH_USER_MODEL = "accounts.User" 
+
+AUTHENTICATION_BACKENDS = [
+    "apps.accounts.backends.PhoneBackend",
 ]
 
 

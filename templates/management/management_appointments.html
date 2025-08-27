@@ -1,0 +1,217 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>بررسی نوبت‌ها</title>
+    <!-- Vazir font -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@27.0.1/dist/font-face.css">
+    <link rel="stylesheet" href="{% static 'css/management_appointments.css' %}">
+
+    
+
+</head>
+
+<body>
+    <div id="app">
+        <!-- Toast Container -->
+        <div class="toast-container" aria-live="polite" aria-atomic="true">
+            <div v-for="toast in toasts" :key="toast.id" :class="['toast', toast.type]">
+                [[ toast.message ]]
+            </div>
+        </div>
+
+        <!-- تقویم -->
+        <div class="calendar" v-if="ready">
+            <div class="header">
+                <button class="icon" @click="prevMonth()">&lt;</button>
+                <div class="month">
+                    <span>[[ monthTitle ]]</span>
+                    <small style="display:block; color:var(--muted);">[[ calendar.year ]]</small>
+                </div>
+                <button class="icon" @click="nextMonth()">&gt;</button>
+            </div>
+
+            <div class="weekdays">
+                <div v-for="wd in calendar.weekdays" :key="wd">[[ wd ]]</div>
+            </div>
+
+            <div class="grid">
+                <div v-for="(cell, idx) in calendar.grid" :key="idx"
+                    :class="['cell', { 'empty': !cell.num, 'today': cell.isToday, 'holiday': cell.isHoliday, 'past': cell.isPast, 'selected': cell.num && selectedDayNum === cell.num && selectedDayMonth === calendar.month && selectedDayYear === calendar.year }]"
+                    :data-day="cell.num" :data-month="calendar.month" :data-year="calendar.year"
+                    @click="cell.num && selectDay(cell.num); activeTable = 1; updateTabUnderline()"
+                    @keydown.enter.prevent="cell.num && selectDay(cell.num)"
+                    @keydown.space.prevent="cell.num && selectDay(cell.num)" tabindex="0" role="button"
+                    :aria-pressed="(cell.num && selectedDayNum === cell.num && selectedDayMonth === calendar.month && selectedDayYear === calendar.year) ? 'true' : 'false'"
+                    :aria-label="cell.num ? (`${cell.num}، ${monthTitle} ${calendar.year} — ${cell.eventCount} نوبت`) : ''"
+                    @dragover.prevent @drop.prevent="onCellDrop(cell)">
+                    <div class="date">[[  cell.num ? cell.num : ''   ]]</div>
+                    <div v-if="cell.eventCount > 0" class="dot" :aria-hidden="true">[[ cell.eventCount ]]</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- tabs -->
+        <div v-if="ready">
+            <div class="controls" role="tablist" aria-label="نمای جداول نوبت‌ها">
+                <div class="tabs" role="presentation">
+                    <button role="tab" class="tab" :class="{ 'active': activeTable===1 }"
+                        @click="activeTable = 1; updateTabUnderline()"
+                        :aria-selected="activeTable===1 ? 'true' : 'false'">تایید شده‌ها</button>
+
+                    <button role="tab" class="tab" :class="{ 'active': activeTable===2 }"
+                        @click="activeTable = 2; updateTabUnderline()" data-drop-target="pending"
+                        :aria-selected="activeTable===2 ? 'true' : 'false'" @drop="onDropToPending" @dragover.prevent>
+                        در انتظار بررسی
+                        <!-- badge -->
+                        <span v-if="pendingCount > 0" class="tab-badge">[[ pendingCount ]]</span>
+                    </button>
+
+                    <button role="tab" class="tab" :class="{ 'active': activeTable===3 }"
+                        @click="activeTable = 3; updateTabUnderline()"
+                        :aria-selected="activeTable===3 ? 'true' : 'false'" @dragover.prevent @drop="onDropToCancelled"
+                        data-drop-target="cancel">
+                        <span v-if="cancelledCount > 0" class="tab-badge">[[ cancelledCount ]]</span>
+                        لغو شده‌ها
+                    </button>
+
+
+                    <!-- sliding underline (single element) -->
+                    <span class="tab-underline" :style="{background: underlineColor}" aria-hidden="true"></span>
+                </div>
+            </div>
+
+
+            <!-- tab 1 -->
+            <div v-show="activeTable===1" v-cloak>
+                <div
+                    style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; max-width: 720px; margin-inline: auto ;">
+                    <div v-for="(slot, si) in slotBoxes" :key="si" class="data-card slot-box" :data-slot-index="si"
+                        style="min-height:120px; padding:10px; border:1px dashed rgba(255,255,255,0.2); border-radius:8px;"
+                        :class="{'disabled-slot': isSelectedDatePast()}" @dragover.prevent="onSlotDragOver($event, si)"
+                        @drop.prevent="onSlotDrop($event, si)">
+
+                        <div
+                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                            <strong>[[ slot.time ]]</strong>
+                            <small style="color:var(--muted);"><span>[[ slot.items.length ]]</span>/3</small>
+                        </div>
+
+                        <div v-if="slot.items.length === 0"
+                            style="color:var(--muted); text-align:center; padding:12px;">
+                            خالی
+                        </div>
+
+                        <!-- items -->
+                        <div v-for="(item, idx) in slot.items" :key="item._idx" class="draggable-row" draggable="false"
+                            style="display:flex; align-items:center; gap:8px; padding:8px; border-radius:8px; margin-bottom:8px; background:rgba(255,255,255,0.02);">
+
+                            <!-- Handle -->
+                            <button class="card-item-handle" :class="{ 'past-checked': isSelectedDatePast() }"
+                                type="button" :title="isSelectedDatePast() ? 'نوبت گذشته — مشاهده' : 'جابجایی'"
+                                :aria-label="isSelectedDatePast() ? 'نوبت گذشته' : 'جابجایی نوبت'"
+                                :draggable="!isSelectedDatePast()"
+                                @dragstart="!isSelectedDatePast() && dragStartFromSlot(si, idx, $event)"
+                                @dragend="dragEnd($event)"
+                                @touchstart.prevent="!isSelectedDatePast() && touchStartFromSlot(si, idx, $event)"
+                                @mousedown.prevent="!isSelectedDatePast() && mouseStartFromSlot(si, idx, $event)"
+                                @click.stop>
+                                <!-- نمایش تیک برای روزهای گذشته و آیکون هندل برای روزهای جاری -->
+                                <span v-if="isSelectedDatePast()" class="handle-check" aria-hidden="true">✔</span>
+                            </button>
+
+                            <!-- محتوای قابل کلیک (لینک) -->
+                            <a class="item-link" :href="'https://www.google.com'" target="_blank"
+                                rel="noopener noreferrer" draggable="false">
+                                <div>
+                                    <div style="font-weight:600; font-size: 13px;">[[ item.user_fullname ]]
+                                    </div>
+                                </div>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- tab 2  -->
+            <div class="card-list" v-show="activeTable===2" v-cloak>
+                <div v-for="(a,i) in pendingAppointments" :key="a._idx" class="data-card appointment-card"
+                    draggable="false">
+
+                    <div class="card-row" style="display:flex; align-items:center; gap:10px;">
+
+                        <!-- Drag handle (فقط این دکمه درگ‌پذیر است) -->
+                        <button class="card-handle" title="جابجایی" aria-label="جابجایی" draggable="true"
+                            @dragstart="dragStart(a._idx, $event)" @dragend="dragEnd($event)"
+                            @touchstart.prevent="touchStart(a._idx, $event)"
+                            @mousedown.prevent="mouseStart(a._idx, $event)"></button>
+
+                        <!-- محتوای قابل کلیک (لینک) -->
+                        <a class="card-link" :href="'https://www.google.com'" target="_blank" rel="noopener noreferrer">
+                            <div class="card-content" style="flex:1;">
+                                <div class="card-header"><strong>[[ a.user_fullname ]]</strong></div>
+                                <div class="card-body">
+                                    <p class="muted">تاریخ درخواست: 1404/07/07</p>
+                                </div>
+                            </div>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div v-if="pendingAppointments.length===0" class="muted" style="text-align:center; padding:16px;">
+                    نوبت در حال بررسی وجود ندارد.
+                </div>
+            </div>
+
+            <!-- tab 3 -->
+            <div v-show="activeTable===3" v-cloak>
+                <div>
+                    <table style="max-width: 720px; margin-inline: auto ;">
+                        <thead>
+                            <tr>
+                                <th>کاربر</th>
+                                <th>علت لغو</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(a,i) in cancelledAppointments" :key="a._idx">
+                                <td>[[ a.user_fullname ]]</td>
+                                <td>[[  a.cancel_reason || '—'  ]]</td>
+                            </tr>
+                            <tr v-if="cancelledAppointments.length===0">
+                                <td colspan="2" class="muted" style="text-align:center">نوبت لغو شده‌ای وجود ندارد.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Cancel Modal -->
+        <div v-if="showCancelModal" class="modal-overlay">
+            <div class="modal">
+                <h3>علت لغو نوبت</h3>
+                <textarea v-model="cancelReason" placeholder="علت لغو را وارد کنید"></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-danger" @click="confirmCancel">تایید و لغو</button>
+                    <button class="btn" @click="closeCancelModal">انصراف</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/pkgs/vue.global.prod.js' %}"></script>
+    <script src="{% static 'js/pkgs/jalaali.min.js' %}"></script>
+
+    <script src="{% static 'js/management_appointments.js' %}"></script>
+
+</body>
+
+</html>
