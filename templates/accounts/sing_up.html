@@ -1,0 +1,156 @@
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{% static 'js/pkgs/axios.min.js' %}"></script>
+    <script defer src="{% static 'js/pkgs/alpine.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <title>ثبت نام</title>
+</head>
+
+<body>
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <h1 x-text="message"></h1>
+    <div class="form-container" x-data="formData">
+        <div class="form-title"> ثبت نام </div>
+
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="step-number active" :class="{ active: step === 1, completed: step > 1 }">1</div>
+            <div class="step-line" :class="{ completed: step > 1 }"></div>
+            <div class="step-number" :class="{ active: step === 2, completed: step > 2 }">2</div>
+            <div class="step-line" :class="{ completed: step > 2 }"></div>
+            <div class="step-number" :class="{ active: step === 3, completed: step > 3 }">3</div>
+            <div class="step-line" :class="{ completed: step > 3 }"></div>
+            <div class="step-number" :class="{ active: step === 4, completed: step > 4 }">4</div>
+        </div>
+
+        <!-- Step 1: First Name -->
+        <div x-show="step === 1" class="fade-in">
+            <div class="input-wrapper">
+                <input id="input1" type="text" x-model="firstName" @focus="onFocus('firstName')"
+                    @blur="onBlur('firstName')" @input="clearError" placeholder=" " autocomplete="off">
+                <label for="input1" x-text="placeholder" class="typing-animation">نام</label>
+            </div>
+            <div class="button-container">
+                <button @click="nextStep">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 0 .5-.5">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 2: Last Name -->
+        <div x-show="step === 2" class="fade-in" style="display: none;">
+            <div class="input-wrapper">
+                <input id="input2" type="text" x-model="lastName" @focus="onFocus('lastName')"
+                    @blur="onBlur('lastName')" @input="clearError" placeholder=" " autocomplete="off">
+                <label for="input2" x-text="placeholder" class="typing-animation">نام خانوادگی</label>
+            </div>
+            <div class="button-container">
+                <button @click="prevStep" class="back-btn">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
+                        </path>
+                    </svg>
+                </button>
+                <button @click="nextStep">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5a.5.5 0 0 0 .5-.5">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Phone Number -->
+        <div x-show="step === 3" class="fade-in" style="display: none;">
+            <div class="input-wrapper">
+                <input id="input3" @input="filterDigits()" type="tel" x-model="phoneNumber" @keyup.enter="sendOTP"
+                    @focus="onFocus('phoneNumber')" @blur="onBlur('phoneNumber')" placeholder=" " autocomplete="off">
+                <label for="input3" x-text="placeholder" class="typing-animation">شماره تلفن</label>
+            </div>
+            <div class="button-container">
+                <button @click="prevStep" class="back-btn">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
+                        </path>
+                    </svg>
+                </button>
+                <button @click="sendOTP" :disabled="isLoading">
+                    <svg x-show="!isLoading" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5">
+                        </path>
+                        <path
+                            d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z">
+                        </path>
+                    </svg>
+                    <span x-show="isLoading">در حال ارسال...</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 4: OTP Verification -->
+        <div x-show="step === 4" class="fade-in" style="display: none;">
+            <div class="input-wrapper">
+                <input id="input4" type="text" x-model="otpCode" @keyup.enter="verifyOTP" @focus="onFocus('otpCode')"
+                    @blur="onBlur('otpCode')" @input="clearError" placeholder=" " autocomplete="off">
+                <label for="input4" x-text="placeholder" class="typing-animation">کد تایید</label>
+            </div>
+            <div class="otp-info" x-show="otpSent">
+                <p>کد تایید به شماره <span x-text="phoneNumber"></span> ارسال شد</p>
+                <button @click="resendOTP" :disabled="resendCooldown > 0" class="resend-btn">
+                    <span x-show="resendCooldown === 0">ارسال مجدد</span>
+                    <span x-show="resendCooldown > 0" x-text="'ارسال مجدد در ' + resendCooldown + ' ثانیه'"></span>
+                </button>
+            </div>
+            <div class="button-container">
+                <button @click="prevStep" class="back-btn">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8">
+                        </path>
+                    </svg>
+                </button>
+                <button @click="verifyOTP" :disabled="isLoading">
+                    <svg x-show="!isLoading" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5">
+                        </path>
+                        <path
+                            d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z">
+                        </path>
+                    </svg>
+                    <span x-show="isLoading">در حال تایید...</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Success Step -->
+        <div x-show="step === 5" class="fade-in" style="display: none;">
+            <div class="success-message">
+                <svg width="64" height="64" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                </svg>
+                <h2>ثبت نام موفقیت‌آمیز!</h2>
+                <p>خوش آمدید <span x-text="firstName + ' ' + lastName"></span></p>
+                <button @click="goToDashboard" class="dashboard-btn">
+                    ورود به داشبورد
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="{% static 'js/sing_up.js' %}"></script>
+
+</body>

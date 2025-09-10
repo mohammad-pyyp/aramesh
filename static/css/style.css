@@ -147,7 +147,7 @@ body {
     margin-top: 5rem;
 }
 
-button a{
+button a {
     text-decoration: none;
     color: #333;
 }
@@ -339,3 +339,74 @@ button:active {
     color: rgb(11, 212, 243);
 }
 
+/* Additional styles for sign-up page */
+.otp-info {
+    text-align: center;
+    margin: 20px 0;
+    color: #ccc;
+    font-size: 14px;
+}
+
+.otp-info p {
+    margin-bottom: 10px;
+}
+
+.otp-info span {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.resend-btn {
+    background-color: transparent;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.resend-btn:hover {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.resend-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.resend-btn:disabled:hover {
+    background-color: transparent;
+    color: var(--primary-color);
+}
+
+.dashboard-btn {
+    background-color: var(--success-color);
+    color: white;
+    padding: 12px 24px;
+    font-size: 16px;
+    border-radius: 25px;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:disabled:hover {
+    transform: none;
+    background-color: orange;
+}
+
+.back-btn:disabled:hover {
+    background-color: #6c757d;
+}
