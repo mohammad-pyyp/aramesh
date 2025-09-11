@@ -5,6 +5,7 @@ from accounts.views import (
     CustomTokenRefreshView, LogoutView, LogoutAllView, 
     TokenVerifyView, UserProfileUpdateView
 )
+from core.views import AppointmentListView, AppointmentCreateView
 
 app_name = "api"
 
@@ -23,4 +24,8 @@ urlpatterns = [
     # User profile
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("profile/", UserProfileUpdateView.as_view(), name="profile_update"),
+    
+    # Appointments
+    path("appointments/", AppointmentListView.as_view(), name="appointments_list"),
+    path("appointments/create/", AppointmentCreateView.as_view(), name="appointments_create"),
 ]

@@ -1,0 +1,646 @@
+{% load static %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ثبت نام — فرم چندمرحله‌ای</title>
+
+    <!-- فونت -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+
+    <!-- متا برای CSRF (فقط برای مرجع — Fetch از کوکی استفاده می‌کند) -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <style>
+        :root {
+            --bg: #0a0f1a;
+            --bg2: #111827;
+            --card: rgba(255, 255, 255, 0.04);
+            --text: #f5f5f5;
+            --muted: #9ca3af;
+            --border: #2d3748;
+            --primary: #818cf8;
+            --primary-600: #6366f1;
+            --shadow: 0 6px 28px rgba(0, 0, 0, .4);
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f9fafb;
+            --bg2: #ffffff;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #6366f1;
+            --primary-600: #4f46e5;
+            --shadow: 0 6px 28px rgba(0, 0, 0, .06);
+        }
+
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 50%, var(--bg) 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            color: var(--text);
+        }
+
+        .page-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            direction: rtl;
+            font-family: 'Vazirmatn', sans-serif;
+            color: var(--text, #f5f5f5);
+            padding: 24px;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 36px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 6px 28px rgba(0, 0, 0, .4);
+        }
+
+        .form-title {
+            text-align: center;
+            font-weight: 700;
+            font-size: 22px;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+
+        @keyframes heartbeat {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            14% {
+                transform: scale(1.25);
+            }
+
+            28% {
+                transform: scale(1);
+            }
+
+            42% {
+                transform: scale(1.25);
+            }
+
+            70% {
+                transform: scale(1);
+            }
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--border, #2d3748);
+            color: var(--text);
+            font-weight: 700;
+            transition: all .3s;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .step-number.active {
+            background: var(--primary, #6366f1);
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .12);
+        }
+
+        .step-number.completed {
+            background: var(--approved, #34d399);
+            color: #fff;
+        }
+
+        .step-line {
+            width: 50px;
+            height: 2px;
+            background: var(--border, #2d3748);
+            transition: all .3s;
+        }
+
+        .step-line.completed {
+            background: var(--approved, #34d399);
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 12px auto 18px;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 10px 8px 10px;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid var(--color-float-input, #6366f1);
+            font-size: 18px;
+            color: var(--text);
+            outline: 0;
+            transition: border-color .3s, color .3s;
+            text-align: center;
+        }
+
+        .input-wrapper input::placeholder {
+            color: transparent;
+        }
+
+        .input-wrapper input:focus {
+            border-bottom: 2px solid var(--bg-float-label, #4f46e5);
+        }
+
+        .input-wrapper label {
+            position: absolute;
+            top: 12px;
+            right: 10px;
+            font-size: 18px;
+            color: var(--muted, #9ca3af);
+            pointer-events: none;
+            transition: .25s;
+        }
+
+        /* floating label rules */
+        .input-wrapper input:focus+label,
+        .input-wrapper input:not(:placeholder-shown)+label,
+        .input-wrapper input[value=""]+label {
+            top: -8px;
+            right: 0;
+            font-size: 14px;
+            color: var(--bg-float-label, #4f46e5);
+        }
+
+        .error-message {
+            color: var(--error-color, #f87171);
+            font-size: 14px;
+            margin-top: 6px;
+            opacity: 1;
+            transform: translateY(0);
+            transition: all .3s;
+            text-align: center;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 2.5rem;
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 16px;
+            cursor: pointer;
+            background: var(--primary, #6366f1);
+            color: var(--text);
+            border: none;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
+            transition: transform .12s ease, filter .12s ease;
+        }
+
+        button:hover {
+            filter: brightness(.95);
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+            color: var(--text);
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 12px;
+            color: var(--text);
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--approved, #34d399);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 14px;
+            animation: bounce .6s ease;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .info-box {
+            margin-top: 18px;
+            padding: 16px;
+            background: var(--bg2, #010611);
+            border-radius: 10px;
+            text-align: right;
+            border: 1px solid var(--border, rgba(255, 255, 255, 0.03));
+            color: var(--text);
+        }
+
+        .fade-in {
+            animation: fadeIn .36s ease;
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width:520px) {
+            .form-container {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .button-container {
+                margin-top: 2rem;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ریشه اپ — آدرس‌های API را از URLهای Django می‌گیریم -->
+    <div id="app" class="page-wrap">
+        <div class="form-container" aria-live="polite" role="form">
+            <div class="form-title"> ثبت نام </div>
+
+            <!-- Step Indicator -->
+            <div class="step-indicator" aria-hidden="false">
+                <div :class="['step-number', { active: step === 1, completed: step > 1 }]">1</div>
+                <div :class="['step-line', { completed: step > 1 }]"></div>
+                <div :class="['step-number', { active: step === 2, completed: step > 2 }]">2</div>
+                <div :class="['step-line', { completed: step > 2 }]"></div>
+                <div :class="['step-number', { active: step === 3, completed: step > 3 }]">3</div>
+                <div :class="['step-line', { completed: step > 3 }]"></div>
+                <div :class="['step-number', { active: step === 4, completed: step > 4 }]">4</div>
+            </div>
+
+            <!-- Step 1 -->
+            <section v-show="step === 1" class="fade-in">
+                <div class="input-wrapper">
+                    <input id="firstName" type="text" v-model="firstName" @focus="onFocus('firstName')"
+                        @blur="onBlur('firstName')" @input="clearError" placeholder=" " />
+                    <label for="firstName">{{ floatingPlaceholder }}</label>
+                </div>
+                <p v-if="error && step === 1" class="error-message show" role="alert">{{ error }}</p>
+                <div class="button-container">
+                    <button @click="nextStep" type="button" aria-label="بعدی">
+                        بعدی
+                    </button>
+                </div>
+            </section>
+
+            <!-- Step 2 -->
+            <section v-show="step === 2" class="fade-in">
+                <div class="input-wrapper">
+                    <input id="lastName" type="text" v-model="lastName" @focus="onFocus('lastName')"
+                        @blur="onBlur('lastName')" @input="clearError" placeholder=" " />
+                    <label for="lastName">{{ floatingPlaceholder }}</label>
+                </div>
+                <p v-if="error && step === 2" class="error-message show" role="alert">{{ error }}</p>
+
+                <div class="button-container">
+                    <button @click="prevStep" type="button" class="back-btn" aria-label="قبلی">قبلی</button>
+                    <button @click="nextStep" type="button" aria-label="بعدی">بعدی</button>
+                </div>
+            </section>
+
+            <!-- Step 3 -->
+            <section v-show="step === 3" class="fade-in">
+                <div class="input-wrapper">
+                    <input id="phone" inputmode="tel" type="tel" v-model="phoneNumber" @input="onPhoneInput"
+                        @focus="onFocus('phoneNumber')" @blur="onBlur('phoneNumber')" placeholder=" " />
+                    <label for="phone">{{ floatingPlaceholder }}</label>
+                </div>
+                <p v-if="error && step === 3" class="error-message show" role="alert">{{ error }}</p>
+
+                <div class="button-container">
+                    <button @click="prevStep" type="button" class="back-btn" aria-label="قبلی">قبلی</button>
+                    <button @click="sendOtp" type="button" aria-label="ارسال کد">ارسال کد</button>
+                </div>
+            </section>
+
+            <!-- Step 4: OTP -->
+            <section v-show="step === 4" class="fade-in">
+                <div class="input-wrapper">
+                    <input id="otp" maxlength="6" type="text" v-model="otp" inputmode="numeric" placeholder=" " />
+                    <label for="otp">کد تایید</label>
+                </div>
+                <div class="info-row" style="text-align:center; margin-top:10px;">
+                    <span>{{ countdownText }}</span>
+                </div>
+                <p v-if="error && step === 4" class="error-message show" role="alert">{{ error }}</p>
+
+                <div class="button-container">
+                    <button @click="prevStep" type="button" class="back-btn" aria-label="قبلی">قبلی</button>
+                    <button @click="submitForm" type="button">تایید</button>
+                    <button v-if="canResend" @click="resendOtp" type="button" class="back-btn">ارسال مجدد</button>
+                </div>
+            </section>
+
+            <!-- Success -->
+            <section v-show="step === 5" class="success-message fade-in" aria-live="polite">
+                <div class="success-icon" aria-hidden="true">
+                    <svg width="40" height="40" fill="white" viewBox="0 0 16 16">
+                        <path
+                            d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z">
+                        </path>
+                    </svg>
+                </div>
+                <h2>ثبت شد!</h2>
+                <p>فرم شما با موفقیت ارسال شد. متشکریم.</p>
+
+                <div class="info-box">
+                    <h3>اطلاعات ثبت شده:</h3>
+                    <p><strong>نام:</strong> <span>{{ firstName }}</span></p>
+                    <p><strong>نام خانوادگی:</strong> <span>{{ lastName }}</span></p>
+                    <p><strong>شماره تلفن:</strong> <span>{{ phoneNumber }}</span></p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Vue 3 (CDN) -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <script>
+        (function () {
+            const { createApp, ref, computed, onMounted, onBeforeUnmount } = Vue;
+
+            // helper: read cookie (برای CSRF)
+            function getCookie(name) {
+                const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                return v ? v.pop() : '';
+            }
+
+            // callApi wrapper با header CSRF
+            async function callApi(url, { method = 'GET', body = null } = {}) {
+                const headers = { 'Accept': 'application/json' };
+                const csrftoken = getCookie('csrftoken') || '';
+                if (method !== 'GET') {
+                    headers['Content-Type'] = 'application/json';
+                    if (csrftoken) headers['X-CSRFToken'] = csrftoken;
+                }
+                const res = await fetch(url, {
+                    method,
+                    headers,
+                    body: body ? JSON.stringify(body) : null,
+                    credentials: 'same-origin'
+                });
+                const data = await res.json().catch(() => ({}));
+                return { ok: res.ok, statusCode: res.status, data };
+            }
+
+            createApp({
+                setup() {
+                    const root = document.getElementById('app');
+                    const sendOtpUrl = root.getAttribute('data-send-otp-url');
+                    const registerUrl = root.getAttribute('data-register-url');
+
+                    const step = ref(1);
+                    const firstName = ref('');
+                    const lastName = ref('');
+                    const phoneNumber = ref('');
+                    const otp = ref('');
+                    const error = ref('');
+                    const floatingPlaceholder = ref('نام');
+                    const typingTimer = { id: null };
+
+                    const countdown = ref(300);
+                    let timerId = null;
+                    const canResend = ref(false);
+
+                    const persianNameRegex = /^[\u0626\u0627-\u063A\u0641-\u0642\u0644-\u0648\u0647\u06A9\u06AF\u06BE\u06CC\u067E\u0686\u0698\u06AF\u06CC\u200C\s\-‌]{3,}$/u;
+
+                    const countdownText = computed(() => {
+                        const min = String(Math.floor(countdown.value / 60)).padStart(2, '0');
+                        const sec = String(countdown.value % 60).padStart(2, '0');
+                        return `زمان باقیمانده: ${min}:${sec}`;
+                    });
+
+                    function startTimer() {
+                        countdown.value = 300;
+                        canResend.value = false;
+                        clearInterval(timerId);
+                        timerId = setInterval(() => {
+                            if (countdown.value > 0) countdown.value--;
+                            else { canResend.value = true; clearInterval(timerId); }
+                        }, 1000);
+                    }
+
+                    function filterDigits(raw) {
+                        return raw
+                            .replace(/[٠-٩]/g, d => String(d.charCodeAt(0) - 1632))
+                            .replace(/[۰-۹]/g, d => String(d.charCodeAt(0) - 1776))
+                            .replace(/[^0-9]/g, '');
+                    }
+
+                    function onPhoneInput(e) {
+                        phoneNumber.value = filterDigits(e.target.value);
+                        clearError();
+                    }
+
+                    function validateName(name, label) {
+                        if (!name.trim()) return `${label} الزامی است.`;
+                        if (!persianNameRegex.test(name.trim())) return `${label} باید حداقل ۳ حرف فارسی داشته باشد.`;
+                        return '';
+                    }
+
+                    function validatePhoneNumber(phone) {
+                        if (!phone.trim()) return 'شماره تلفن الزامی است.';
+                        if (!/^09\d{9}$/.test(phone.trim())) return 'شماره تلفن باید 11 رقم باشد و با 09 شروع شود.';
+                        return '';
+                    }
+
+                    async function sendOtp() {
+                        error.value = '';
+                        // اعتبارسنجی پایه
+                        const err = validatePhoneNumber(phoneNumber.value);
+                        if (err) { error.value = err; startTyping(err); return; }
+
+                        // تماس به Django endpoint
+                        const res = await callApi(sendOtpUrl, { method: 'POST', body: { phone: phoneNumber.value } });
+                        if (res.ok && res.data && (res.data.status === 'ok' || res.data.success)) {
+                            step.value = 4;
+                            startTimer();
+                        } else {
+                            error.value = res.data?.error || 'خطا در ارسال کد.';
+                        }
+                    }
+
+                    async function resendOtp() {
+                        error.value = '';
+                        const res = await callApi(sendOtpUrl, { method: 'POST', body: { phone: phoneNumber.value, resend: true } });
+                        if (res.ok && res.data && (res.data.status === 'ok' || res.data.success)) {
+                            startTimer();
+                            error.value = '';
+                        } else {
+                            error.value = res.data?.error || 'خطا در ارسال مجدد کد.';
+                        }
+                    }
+
+                    function nextStep() {
+                        error.value = '';
+                        if (step.value === 1) {
+                            const err = validateName(firstName.value, 'نام');
+                            if (err) { error.value = err; startTyping(err); return; }
+                            step.value = 2;
+                            startTyping('نام خانوادگی');
+                        } else if (step.value === 2) {
+                            const err = validateName(lastName.value, 'نام خانوادگی');
+                            if (err) { error.value = err; startTyping(err); return; }
+                            step.value = 3;
+                            startTyping('شماره تلفن');
+                        }
+                    }
+
+                    function prevStep() {
+                        if (step.value > 1) {
+                            step.value--;
+                            error.value = '';
+                            startTyping(step.value === 1 ? 'نام' : 'نام خانوادگی');
+                        }
+                    }
+
+                    async function submitForm() {
+                        error.value = '';
+                        // اعتبارسنجی ساده OTP
+                        if (!otp.value || !/^\d{4,6}$/.test(otp.value.trim())) {
+                            error.value = 'کد تایید معتبر نیست.';
+                            return;
+                        }
+
+                        const payload = {
+                            phone: phoneNumber.value,
+                            first_name: firstName.value,
+                            last_name: lastName.value,
+                            otp: otp.value
+                        };
+
+                        const res = await callApi(registerUrl, { method: 'POST', body: payload });
+                        if (res.ok && res.data && (res.data.status === 'ok' || res.data.success)) {
+                            // اگر توکن فرستاده شده، در کوکی ذخیره کن (نمونه)
+                            if (res.data.access) {
+                                document.cookie = `access_token=${res.data.access}; path=/;`;
+                            }
+                            if (res.data.refresh) {
+                                document.cookie = `refresh_token=${res.data.refresh}; path=/;`;
+                            }
+                            step.value = 5;
+                        } else {
+                            error.value = res.data?.error || 'ثبت‌نام ناموفق بود';
+                        }
+                    }
+
+                    function clearError() { error.value = ''; }
+
+                    function startTyping(text) {
+                        clearInterval(typingTimer.id);
+                        floatingPlaceholder.value = '';
+                        let idx = 0;
+                        typingTimer.id = setInterval(() => {
+                            if (idx < text.length) {
+                                floatingPlaceholder.value += text[idx];
+                                idx++;
+                            } else {
+                                clearInterval(typingTimer.id);
+                            }
+                        }, 30);
+                    }
+
+                    function onFocus(field) {
+                        clearError();
+                        if (field === 'firstName') startTyping('نام خود را وارد کنید...');
+                        else if (field === 'lastName') startTyping('نام خانوادگی خود را وارد کنید...');
+                        else if (field === 'phoneNumber') startTyping('شماره تلفن خود را وارد کنید...');
+                    }
+
+                    function onBlur(field) {
+                        if (field === 'firstName') startTyping('نام');
+                        else if (field === 'lastName') startTyping('نام خانوادگی');
+                        else if (field === 'phoneNumber') startTyping('شماره تلفن');
+                    }
+
+                    onMounted(() => { startTyping('نام'); });
+                    onBeforeUnmount(() => { clearInterval(typingTimer.id); clearInterval(timerId); });
+
+                    return {
+                        step, firstName, lastName, phoneNumber, otp, error, floatingPlaceholder,
+                        countdownText, canResend, nextStep, prevStep, sendOtp, resendOtp, submitForm,
+                        onPhoneInput, onFocus, onBlur, clearError
+                    };
+                }
+            }).mount('#app');
+        })();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,3 @@
+for activate env
+
+call : C:\Users\Reza.asa\Documents\pro\env\Scripts\activate.bat

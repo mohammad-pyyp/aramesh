@@ -29,14 +29,14 @@ def error_response(message, status_code=status.HTTP_400_BAD_REQUEST, data=None):
     return Response({"success": False, "message": message, "data": data or {}}, status=status_code)
 
 
-def sing_in_page(request):
+def login_page(request):
     """Render the sign-in page"""
-    return render(request, 'accounts/sing_in.html')
+    return render(request, 'accounts/login.html')
 
 
-def sing_up_page(request):
+def register_page(request):
     """Render the sign-up page"""
-    return render(request, 'accounts/sing_up.html')
+    return render(request, 'accounts/register.html')
 
 
 class SendOTPView(APIView):
