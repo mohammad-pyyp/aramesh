@@ -1,44 +1,10 @@
 # api/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from .models import OTP
-import re
-
 User = get_user_model()
 
 PHONE_REGEX = r'^09\d{9}$'  # هم‌خوان با validator مدل User
 
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    """Custom JWT serializer with additional user data"""
-    
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-        
-        # Add custom claims
-        token['phone'] = user.phone
-        token['first_name'] = user.first_name
-        token['last_name'] = user.last_name
-        token['is_staff'] = user.is_staff
-        
-        return token
-    
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        
-        # Add user data to response
-        data['user'] = {
-            'id': self.user.id,
-            'phone': self.user.phone,
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name,
-            'is_staff': self.user.is_staff,
-            'date_joined': self.user.date_joined,
-        }
-        
-        return data
 
 
 class SendOTPSerializer(serializers.Serializer):
@@ -93,35 +59,5 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'phone', 'date_joined', 'is_staff')
 
 
-class TokenRefreshSerializer(serializers.Serializer):
-    """Custom refresh token serializer"""
-    refresh = serializers.CharField()
-    
-    def validate(self, attrs):
-        refresh = attrs['refresh']
-        
-        try:
-            from rest_framework_simplejwt.tokens import RefreshToken
-            token = RefreshToken(refresh)
-            attrs['refresh'] = token
-        except Exception:
-            raise serializers.ValidationError("توکن نامعتبر است.")
-        
-        return attrs
 
 
-class LogoutSerializer(serializers.Serializer):
-    """Serializer for logout functionality"""
-    refresh = serializers.CharField()
-    
-    def validate(self, attrs):
-        refresh = attrs['refresh']
-        
-        try:
-            from rest_framework_simplejwt.tokens import RefreshToken
-            token = RefreshToken(refresh)
-            attrs['refresh'] = token
-        except Exception:
-            raise serializers.ValidationError("توکن نامعتبر است.")
-        
-        return attrs

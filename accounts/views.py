@@ -1,4 +1,4 @@
-# api/views.py
+# accounts/views.py
 import logging
 from django.db import IntegrityError, transaction
 from django.utils import timezone
@@ -6,16 +6,11 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from .models import OTP
-from .serializers import (
-    SendOTPSerializer, RegisterSerializer, LoginSerializer, ProfileSerializer,
-    TokenRefreshSerializer, LogoutSerializer
-)
+from .serializers import (SendOTPSerializer, RegisterSerializer, LoginSerializer, ProfileSerializer,)
 from django.contrib.auth import get_user_model
 from django.shortcuts import render
+from django.contrib.auth import login , logout
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -36,7 +31,7 @@ def login_page(request):
 
 def register_page(request):
     """Render the sign-up page"""
-    return render(request, 'accounts/register.html')
+    return render(request, 'accounts/simple/register.html')
 
 
 class SendOTPView(APIView):
@@ -114,12 +109,16 @@ class RegisterView(APIView):
             logger.exception("Unexpected error while creating user for phone=%s", phone)
             return error_response("خطا در سرور هنگام ثبت‌نام", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        refresh = RefreshToken.for_user(user)
+        login(request, user)  # ایجاد سشن
+        # TODO Redirect user to dashboard (OR) Redirect admin to management page
         return success_response("ثبت‌نام موفق", data={
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
+            "user": {
+                "id": user.id,
+                "phone": user.phone,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            }
         }, status_code=status.HTTP_201_CREATED)
-
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -151,10 +150,16 @@ class LoginView(APIView):
         if not user.is_active:
             return error_response("حساب کاربری غیرفعال است.", status.HTTP_403_FORBIDDEN)
 
-        refresh = RefreshToken.for_user(user)
+        # پس از اعتبارسنجی OTP و گرفتن user
+        login(request, user)
+        # TODO Redirect user to dashboard (OR) Redirect admin to management page
         return success_response("ورود موفق", data={
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
+            "user": {
+                "id": user.id,
+                "phone": user.phone,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            }
         })
 
 
@@ -175,104 +180,14 @@ class DashboardView(APIView):
         return success_response("پروفایل کاربر", data=serializer.data)
 
 
-class CustomTokenRefreshView(TokenRefreshView):
-    """Custom token refresh view with enhanced error handling"""
-    serializer_class = TokenRefreshSerializer
-    
-    def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        
-        try:
-            serializer.is_valid(raise_exception=True)
-        except TokenError as e:
-            return error_response("توکن نامعتبر یا منقضی شده است", status.HTTP_401_UNAUTHORIZED)
-        except InvalidToken as e:
-            return error_response("توکن نامعتبر است", status.HTTP_401_UNAUTHORIZED)
-        
-        return success_response("توکن با موفقیت تازه‌سازی شد", data=serializer.validated_data)
-
 
 class LogoutView(APIView):
-    """Logout view that blacklists the refresh token"""
     permission_classes = [IsAuthenticated]
-    
+
     def post(self, request):
-        serializer = LogoutSerializer(data=request.data)
-        
-        try:
-            serializer.is_valid(raise_exception=True)
-            refresh_token = serializer.validated_data['refresh']
-            refresh_token.blacklist()
-            
-            return success_response("خروج موفقیت‌آمیز", status_code=status.HTTP_200_OK)
-            
-        except TokenError as e:
-            return error_response("توکن نامعتبر است", status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            logger.exception("Error during logout for user %s", request.user.id)
-            return error_response("خطا در خروج از سیستم", status.HTTP_500_INTERNAL_SERVER_ERROR)
+        logout(request)  # پاک کردن سشن
+        return success_response("خروج موفقیت‌آمیز")
 
-
-class LogoutAllView(APIView):
-    """Logout from all devices by blacklisting all user tokens"""
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        try:
-            # Get all outstanding refresh tokens for the user
-            from rest_framework_simplejwt.token_blacklist.models import OutstandingToken
-            
-            tokens = OutstandingToken.objects.filter(user=request.user)
-            for token in tokens:
-                try:
-                    refresh_token = RefreshToken(token.token)
-                    refresh_token.blacklist()
-                except TokenError:
-                    # Token might already be blacklisted or invalid
-                    pass
-            
-            return success_response("خروج از تمام دستگاه‌ها موفقیت‌آمیز", status_code=status.HTTP_200_OK)
-            
-        except Exception as e:
-            logger.exception("Error during logout all for user %s", request.user.id)
-            return error_response("خطا در خروج از تمام دستگاه‌ها", status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-class TokenVerifyView(APIView):
-    """Verify if a token is valid"""
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        token = request.data.get('token')
-        
-        if not token:
-            return error_response("توکن ارائه نشده است", status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            from rest_framework_simplejwt.tokens import AccessToken
-            access_token = AccessToken(token)
-            
-            # Get user from token
-            user_id = access_token['user_id']
-            user = User.objects.get(id=user_id)
-            
-            return success_response("توکن معتبر است", data={
-                'valid': True,
-                'user': {
-                    'id': user.id,
-                    'phone': user.phone,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                }
-            })
-            
-        except TokenError:
-            return error_response("توکن نامعتبر است", status.HTTP_401_UNAUTHORIZED)
-        except User.DoesNotExist:
-            return error_response("کاربر یافت نشد", status.HTTP_401_UNAUTHORIZED)
-        except Exception as e:
-            logger.exception("Error verifying token")
-            return error_response("خطا در بررسی توکن", status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserProfileUpdateView(APIView):

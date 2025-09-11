@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ثبت‌نام</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+
+    <div id="app" class="max-w-md mx-auto mt-10 p-6 bg-white border rounded-xl shadow">
+        <h2 class="text-2xl font-bold mb-4 text-center">ثبت‌نام</h2>
+
+        <!-- شماره موبایل -->
+        <div class="mb-3">
+            <label class="block mb-1 font-medium">شماره موبایل</label>
+            <input v-model="phone" type="text" placeholder="09xxxxxxxxx" class="w-full border rounded p-2" />
+        </div>
+
+        <!-- نام -->
+        <div class="mb-3">
+            <label class="block mb-1 font-medium">نام</label>
+            <input v-model="firstName" type="text" class="w-full border rounded p-2" />
+        </div>
+
+        <!-- نام خانوادگی -->
+        <div class="mb-3">
+            <label class="block mb-1 font-medium">نام خانوادگی</label>
+            <input v-model="lastName" type="text" class="w-full border rounded p-2" />
+        </div>
+
+        <!-- OTP -->
+        <div class="mb-3" v-if="otpSent">
+            <label class="block mb-1 font-medium">کد OTP</label>
+            <input v-model="otp" type="text" maxlength="6" class="w-full border rounded p-2" />
+        </div>
+
+        <!-- دکمه‌ها -->
+        <div class="flex gap-2 mt-4">
+            <button @click="sendOtp" class="flex-1 bg-blue-600 text-white rounded p-2" :disabled="loading">
+                ارسال کد
+            </button>
+
+            <button v-if="otpSent" @click="register" class="flex-1 bg-green-600 text-white rounded p-2"
+                :disabled="loading">
+                ثبت‌نام
+            </button>
+        </div>
+
+        <!-- پیام -->
+        <p v-if="message" class="mt-4 text-center text-sm text-gray-700">
+            {{ message }}
+        </p>
+    </div>
+
+    <script src="{% static 'js/client.js' %}"></script>
+    <script>
+        const { createApp, ref } = Vue;
+
+        createApp({
+            setup() {
+                const phone = ref("");
+                const firstName = ref("");
+                const lastName = ref("");
+                const otp = ref("");
+                const otpSent = ref(false);
+                const message = ref("");
+                const loading = ref(false);
+
+
+                const sendOtp = async () => {
+                    loading.value = true;
+                    message.value = "";
+                    try {
+                        await sessionClient.sendOTP(phone.value, "register");
+                        otpSent.value = true;
+                        message.value = "کد OTP ارسال شد.";
+                    } catch (err) {
+                        message.value = err.response?.data?.message || "خطا در ارسال کد";
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                const register = async () => {
+                    loading.value = true;
+                    message.value = "";
+                    try {
+                        await sessionClient.register(
+                            phone.value,
+                            otp.value,
+                            firstName.value,
+                            lastName.value
+                        );
+                        message.value = "ثبت‌نام موفق 🎉";
+                    } catch (err) {
+                        message.value = err.response?.data?.message || "خطا در ثبت‌نام";
+                    } finally {
+                        loading.value = false;
+                    }
+                };
+
+                return { phone, firstName, lastName, otp, otpSent, message, loading, sendOtp, register };
+            },
+        }).mount("#app");
+    </script>
+
+</body>
+
+</html>
