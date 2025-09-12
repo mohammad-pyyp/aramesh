@@ -22,13 +22,12 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'rest_framework.authtoken',
 
-    "accounts" ,
-    "api" ,
-    "core" ,
+    "api" , #  منطق
+    "pages" , #  ظاهر
 
 ]
 
-AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'api.User'
 
 
 CORS_ALLOW_ALL_ORIGINS = True

@@ -235,14 +235,27 @@
     <div class="floating-element"></div>
 
     <div class="welcome-container">
-        <h1 class="welcome-title"> Welcome </h1>
-        <p class="welcome-subtitle">به دنیای رایحه های آرام‌بخش خوش آمدید . . .</p>
-
+        {% if user.is_authenticated %}
+        <h1 class="welcome-title">{{ user.get_full_name|default:user.full_name }}</h1>
+        <p class="welcome-subtitle">
+            شما با موفقیت وارد حساب کاربری خود شده‌اید.
+        </p>
         <div class="button-group">
-            <a href="{% url 'accounts:register' %}" class="btn btn-primary">ثبت نام</a>
-            <a href="{% url 'accounts:login' %}" class="btn btn-secondary">ورود</a>
+            <a href="{% url 'core:dashboard' %}" class="btn btn-primary">داشبورد</a>
+            <a href="{% url 'accounts:logout' %}" class="btn btn-secondary">خروج</a>
         </div>
+        {% else %}
+        <h1 class="welcome-title">خوش آمدید!</h1>
+        <p class="welcome-subtitle">
+            لطفاً وارد حساب کاربری خود شوید یا ثبت‌نام کنید.
+        </p>
+        <div class="button-group">
+            <a href="{% url 'login' %}" class="btn btn-primary">ورود</a>
+            <a href="{% url 'register' %}" class="btn btn-secondary">ثبت‌نام</a>
+        </div>
+        {% endif %}
     </div>
+
 </body>
 
 </html>
