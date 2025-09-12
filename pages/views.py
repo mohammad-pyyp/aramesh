@@ -2,11 +2,13 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import  redirect
 from django.views.generic import TemplateView as PageView
 from django.contrib.auth import  logout
-
+from .mixins import CustomLoginRequiredMixin , AdminRequiredMixin
 
 
 class WelcomePage(PageView):
-    template_name = 'pages/user/welcome_page.html'
+    # template_name = 'welcome_page.html'
+    template_name = 'gemi/welcome.html'
+
 
 class LoginPage(PageView):
     template_name = 'pages/user/login.html'
