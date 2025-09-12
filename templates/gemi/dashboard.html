@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پروفایل کاربر — رزرو نوبت</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css">
+
+    <style>
+        :root[data-theme="dark"] {
+            --bg: #0a0f1a;
+            --bg2: #010611;
+            --card: rgba(255, 255, 255, 0.04);
+            --text: #f5f5f5;
+            --muted: #9ca3af;
+            --border: #2d3748;
+            --primary: #818cf8;
+            --primary-600: #6366f1;
+            --pending: #fbbf24;
+            --approved: #34d399;
+            --canceled: #f87171;
+            --shadow: 0 6px 28px rgba(0, 0, 0, .4);
+            --radius: 14px;
+        }
+
+        :root[data-theme="light"] {
+            --bg: #f9fafb;
+            --bg2: #ffffff;
+            --card: #ffffff;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #6366f1;
+            --primary-600: #4f46e5;
+            --pending: #d97706;
+            --approved: #059669;
+            --canceled: #dc2626;
+            --shadow: 0 6px 28px rgba(0, 0, 0, .06);
+            --radius: 14px;
+        }
+
+        html,
+        body,
+        .card,
+        .menu,
+        .menu-item,
+        .header,
+        .details {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: saturate(140%) blur(4px);
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: space-between;
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .theme-toggle {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 900ms;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        .theme-toggle:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .theme-toggle .icon {
+            width: 20px;
+            height: 20px;
+            stroke-width: 2;
+        }
+
+        .burger {
+            background: var(--card);
+            position: relative;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .05);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .2s ease;
+        }
+
+        .burger:active {
+            transform: scale(.98)
+        }
+
+        .burger .line {
+            background: var(--text);
+            position: absolute;
+            width: 22px;
+            height: 2px;
+            border-radius: 2px;
+            transition: transform .25s ease, opacity .2s ease, top .25s ease, bottom .25s ease;
+        }
+
+        .burger .line.l1 {
+            top: 14px
+        }
+
+        .burger .line.l2 {
+            top: 21px
+        }
+
+        .burger .line.l3 {
+            top: 28px
+        }
+
+        .burger.is-open .line.l1 {
+            top: 21px;
+            transform: rotate(45deg)
+        }
+
+        .burger.is-open .line.l2 {
+            opacity: 0
+        }
+
+        .burger.is-open .line.l3 {
+            top: 21px;
+            transform: rotate(-45deg)
+        }
+
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .35);
+            backdrop-filter: blur(4px);
+            display: grid;
+            place-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s;
+            z-index: 15;
+        }
+
+        .menu-overlay.open {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .menu {
+            background: var(--bg2);
+            color: var(--text);
+            width: 100%;
+            height: 100%;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            animation: slideIn .25s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: .98;
+                transform: translateX(-10px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        .menu-items {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin: 50px auto 30px;
+            width: min(92vw, 420px);
+        }
+
+        .menu-item {
+            background: var(--bg2);
+            color: var(--text);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .07)
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 18px auto;
+            padding: 0 16px
+        }
+
+        .cta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 12px 0 18px
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-600));
+            color: #fff;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(79, 70, 229, .25);
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .btn-primary[disabled] {
+            opacity: .6;
+            cursor: not-allowed;
+            box-shadow: none
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px
+        }
+
+        @media(min-width:720px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media(min-width:1024px) {
+            .cards {
+                grid-template-columns: repeat(3, 1fr)
+            }
+        }
+
+        .card {
+            position: relative;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            width: 9px;
+            border-radius: 0 var(--radius) var(--radius) 0;
+        }
+
+        .status--pending::before {
+            background: var(--pending)
+        }
+
+        .status--approved::before {
+            background: var(--approved)
+        }
+
+        .status--canceled::before {
+            background: var(--canceled)
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px
+        }
+
+        .card-title {
+            font-weight: 700
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+        }
+
+        .status--pending .badge {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--pending);
+            border-color: rgba(251, 191, 36, 0.4);
+        }
+
+        .status--approved .badge {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--approved);
+            border-color: rgba(52, 211, 153, 0.4);
+        }
+
+        .status--canceled .badge {
+            background: rgba(248, 113, 113, 0.15);
+            color: var(--canceled);
+            border-color: rgba(248, 113, 113, 0.4);
+        }
+
+        .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid currentColor;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .details {
+            padding: 10px;
+            border: 1px dashed var(--border);
+            border-radius: 10px;
+            background: var(--bg2);
+            border-color: var(--border);
+        }
+
+        .pair {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .muted {
+            color: var(--muted)
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
+
+        .modal {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--card);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: right;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Vazirmatn', sans-serif;
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <header class="header">
+            <div class="header-inner">
+                <div style="display:flex;align-items:center;gap:12px">
+                    <button @click="toggleMenu" :class="{ 'is-open': menuOpen }" class="burger"
+                        :aria-expanded="menuOpen.toString()" aria-controls="menu-overlay" aria-label="باز کردن منو">
+                        <span class="line l1"></span>
+                        <span class="line l2"></span>
+                        <span class="line l3"></span>
+                    </button>
+                    <div class="title">{{ userName }}</div>
+                </div>
+                <button class="theme-toggle" @click="toggleTheme"
+                    :aria-label="theme==='dark' ? 'فعال کردن حالت روشن' : 'فعال کردن حالت تاریک'">
+                    <svg v-if="theme==='dark'" xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" class="icon" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 0111.21 3a7 7 0 000 14A9 9 0 0021 12.79z" />
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div id="menu-overlay" class="menu-overlay" :class="{ 'open': menuOpen }" @click.self="menuOpen=false"
+            :aria-hidden="(!menuOpen).toString()">
+            <nav class="menu" aria-label="منوی اصلی">
+                <div style="font-weight:700">منوی اصلی</div>
+                <div class="menu-items">
+                    <a class="menu-item" href="#">نوبت‌های من</a>
+                    <a class="menu-item" href="#" @click.prevent="openBookingModal">رزرو نوبت جدید</a>
+                    <a class="menu-item" href="#">خروج</a>
+                </div>
+            </nav>
+        </div>
+
+        <main class="container">
+            <div v-if="isLoading" style="text-align: center; padding: 2rem;">
+                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                <p class="muted" style="margin-top: 1rem;">در حال بارگذاری...</p>
+            </div>
+            <div v-else>
+                <section class="cta">
+                    <button @click="openBookingModal" class="btn-primary" :disabled="hasPending">رزرو نوبت جدید</button>
+                    <div class="muted" aria-live="polite">{{ liveMessage }}</div>
+                </section>
+                <div class="cards">
+                    <article v-for="ap in reversedAppointments" :key="ap.id" class="card"
+                        :class="'status--' + ap.status">
+                        <div class="card-head">
+                            <div class="card-title">نوبت با {{ ap.details.teacher }}</div>
+                            <div class="badge">
+                                <span>{{ getStatusMeta(ap.status).label }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="details">
+                                <div v-if="ap.status === 'approved'" class="pair"><b>تاریخ:</b> <span>{{ ap.details.date
+                                        }}</span></div>
+                                <div v-if="ap.status === 'approved'" class="pair"><b>ساعت:</b> <span>{{ ap.details.time
+                                        }}</span></div>
+                                <div v-if="ap.status === 'pending'" class="muted">جزئیات پس از تایید نمایش داده خواهد
+                                    شد.</div>
+                                <div v-if="ap.status==='canceled'" class="pair muted"><b>علت:</b> <span>{{ ap.reason
+                                        }}</span></div>
+                            </div>
+                        </div>
+                    </article>
+                    <div v-if="appointments.length === 0" class="card" style="text-align: center; padding: 2rem;">
+                        <div class="muted">هنوز نوبتی ثبت نکرده‌اید</div>
+                        <button @click="openBookingModal" class="btn-primary" style="margin-top: 1rem;">اولین نوبت خود
+                            را رزرو کنید</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Booking Modal -->
+        <div v-if="showBookingModal" class="modal-overlay" @click.self="showBookingModal = false">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>انتخاب استاد</h3>
+                    <button @click="showBookingModal = false" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="submitBooking">
+                        <div class="form-group">
+                            <label for="teacher">لطفا استاد مورد نظر خود را انتخاب کنید:</label>
+                            <select id="teacher" v-model="selectedTeacher" required>
+                                <option value="" disabled>یک استاد انتخاب کنید</option>
+                                <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.name">{{
+                                    teacher.name }} - {{ teacher.specialty }}</option>
+                            </select>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" @click="showBookingModal = false"
+                                class="btn-secondary">انصراف</button>
+                            <button type="submit" class="btn-primary">ثبت نوبت</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const { createApp } = Vue;
+
+            createApp({
+                data() {
+                    return {
+                        userName: 'کاربر خوش آمدید',
+                        menuOpen: false,
+                        appointments: [],
+                        liveMessage: 'برای ثبت نوبت جدید روی دکمه کلیک کنید.',
+                        theme: 'dark',
+                        isLoading: true,
+                        showBookingModal: false,
+                        selectedTeacher: '',
+                        teachers: [
+                            { id: 1, name: 'استاد رضایی', specialty: 'رایحه درمانی' },
+                            { id: 2, name: 'استاد محمدی', specialty: 'عود شناسی' },
+                            { id: 3, name: 'استاد کریمی', specialty: 'مدیتیشن' }
+                        ],
+                    };
+                },
+                computed: {
+                    hasPending() {
+                        return this.appointments.some(a => a.status === 'pending');
+                    },
+                    reversedAppointments() {
+                        return [...this.appointments].reverse();
+                    }
+                },
+                methods: {
+                    init() {
+                        this.loadTheme();
+                        // شبیه سازی بارگذاری اطلاعات
+                        setTimeout(() => {
+                            this.appointments = [
+                                { id: 1, status: 'approved', details: { teacher: 'استاد رضایی', date: '1403/07/12', time: '11:00' } },
+                                { id: 2, status: 'canceled', reason: 'عدم حضور', details: { teacher: 'استاد محمدی' } },
+                            ];
+                            this.isLoading = false;
+                        }, 1500);
+                    },
+                    openBookingModal() {
+                        this.menuOpen = false;
+                        if (this.hasPending) {
+                            this.liveMessage = 'شما یک نوبت در حال بررسی دارید و نمی‌توانید نوبت جدید ثبت کنید.';
+                            return;
+                        }
+                        this.showBookingModal = true;
+                    },
+                    submitBooking() {
+                        if (!this.selectedTeacher) {
+                            alert('لطفا یک استاد را انتخاب کنید.');
+                            return;
+                        }
+                        const newAppointment = {
+                            id: Date.now(),
+                            status: 'pending',
+                            details: {
+                                teacher: this.selectedTeacher,
+                                date: 'نامشخص',
+                                time: 'نامشخص'
+                            }
+                        };
+                        this.appointments.push(newAppointment);
+                        this.showBookingModal = false;
+                        this.liveMessage = 'درخواست شما برای نوبت ثبت شد و در حال بررسی است.';
+                        this.selectedTeacher = ''; // ریست کردن فرم
+                    },
+                    toggleMenu() {
+                        this.menuOpen = !this.menuOpen;
+                    },
+                    getStatusMeta(s) {
+                        return {
+                            pending: { label: 'در حال بررسی' },
+                            approved: { label: 'تایید شد' },
+                            canceled: { label: 'لغو شد' }
+                        }[s] || { label: '' };
+                    },
+                    toggleTheme() {
+                        this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                        document.documentElement.setAttribute('data-theme', this.theme);
+                        localStorage.setItem('theme', this.theme);
+                    },
+                    loadTheme() {
+                        const savedTheme = localStorage.getItem('theme') || 'dark';
+                        this.theme = savedTheme;
+                        document.documentElement.setAttribute('data-theme', this.theme);
+                    }
+                },
+                mounted() {
+                    this.init();
+                }
+            }).mount('#app');
+        });
+    </script>
+</body>
+
+</html>

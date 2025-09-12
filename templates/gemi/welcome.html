@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه عود آرامش - تجربه‌ای از طبیعت</title>
+    <style>
+        /* --- Import Font --- */
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+
+        /* --- General Styles --- */
+        :root {
+            --bg-color: #1a202c;
+            /* پس زمینه تیره */
+            --card-bg-color: #2d3748;
+            /* پس زمینه کارت ها */
+            --primary-text-color: #edf2f7;
+            /* رنگ متن اصلی */
+            --secondary-text-color: #a0aec0;
+            /* رنگ متن ثانویه */
+            --accent-color: #d69e2e;
+            /* رنگ طلایی برای دکمه ها و تاکید */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            /* Telegram-style background pattern (Base64 encoded SVG) */
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232a313e' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--primary-text-color);
+            line-height: 1.8;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            /* Padding افقی در اینجا اعمال می شود */
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 32, 44, 0.8);
+            /* پس زمینه نیمه شفاف */
+            backdrop-filter: blur(10px);
+            /* افکت شیشه ای */
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo a {
+            text-decoration: none;
+            color: var(--primary-text-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .login-btn {
+            color: var(--primary-text-color);
+            border-color: var(--secondary-text-color);
+        }
+
+        .login-btn:hover {
+            background-color: var(--secondary-text-color);
+            color: var(--bg-color);
+        }
+
+        .signup-btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+        }
+
+        .signup-btn:hover {
+            background-color: #b88625;
+            border-color: #b88625;
+        }
+
+        /* --- Typography --- */
+        h1,
+        h2 {
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: #fff;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: var(--primary-text-color);
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+            display: inline-block;
+        }
+
+        section {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            text-align: center;
+            padding: 150px 20px 100px 20px;
+            /* افزایش پدینگ بالا برای قرارگیری زیر نوبار */
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--secondary-text-color);
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+
+        /* --- Call to Action Button --- */
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #b88625;
+            transform: translateY(-3px);
+        }
+
+        /* --- Benefits Section --- */
+        .benefits-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .benefit-item {
+            background-color: var(--card-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            flex-basis: 250px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .benefit-item .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+        }
+
+        .benefit-item h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .benefit-item p {
+            color: var(--secondary-text-color);
+        }
+
+        /* --- Product Section --- */
+        .product-card {
+            background-color: var(--card-bg-color);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            margin: 40px auto 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .product-card h3 {
+            font-size: 1.8rem;
+        }
+
+        .price {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin: 10px 0 25px;
+        }
+
+        /* --- Testimonials Section --- */
+        .testimonial-card {
+            background-color: var(--card-bg-color);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            margin: 40px auto 0;
+            border-right: 5px solid var(--accent-color);
+            text-align: right;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            margin-bottom: 15px;
+            color: var(--secondary-text-color);
+        }
+
+        .testimonial-card cite {
+            font-weight: 700;
+            color: var(--primary-text-color);
+        }
+
+        .testimonial-card:not(:last-child) {
+            margin-bottom: 20px;
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--card-bg-color);
+            color: var(--secondary-text-color);
+            margin-top: 50px;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .hero {
+                padding-top: 120px;
+                padding-bottom: 60px;
+            }
+
+            .logo a {
+                font-size: 1.2rem;
+            }
+
+            .nav-button {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <div class="logo">
+                <a href="#">عود آرامش</a>
+            </div>
+            <div class="nav-links">
+                <!-- لینک های ورود و ثبت نام را اینجا قرار دهید -->
+                <a href="#" class="nav-button login-btn">ورود</a>
+                <a href="#" class="nav-button signup-btn">ثبت نام</a>
+            </div>
+        </div>
+    </nav>
+
+    <main style="margin-top: 30px;">
+        <!-- Benefits Section -->
+        <section id="benefits">
+            <div class="container">
+                <h2>چرا عود آرامش؟</h2>
+                <div class="benefits-grid">
+                    <div class="benefit-item">
+                        <div class="icon">🌿</div>
+                        <h3>۱۰۰٪ طبیعی و ارگانیک</h3>
+                        <p>تهیه شده از بهترین صمغ‌ها و چوب‌های معطر، بدون هیچ‌گونه افزودنی شیمیایی.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="icon">🧘</div>
+                        <h3>آرام‌بخش ذهن و جسم</h3>
+                        <p>رایحه‌های منحصر به فرد ما به کاهش استرس و افزایش تمرکز شما کمک می‌کند.</p>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="icon">✨</div>
+                        <h3>ماندگاری بالا</h3>
+                        <p>هر شاخه عود فضای شما را برای ساعت‌ها معطر و دلنشین نگه می‌دارد.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Testimonials Section -->
+        <section id="testimonials">
+            <div class="container">
+                <h2>صدای مشتریان ما</h2>
+                <div class="testimonial-card">
+                    <p>"کیفیت عودها بی‌نظیره. رایحه صندلش من رو مستقیم به حال و هوای مدیتیشن می‌بره. قطعاً دوباره خرید
+                        می‌کنم."</p>
+                    <cite>- سارا احمدی، تهران</cite>
+                </div>
+                <div class="testimonial-card">
+                    <p>"بسته‌بندی خیلی شیک و زیبا بود و برای هدیه دادن عالیه. ممنون از محصول خوبتون."</p>
+                    <cite>- علی رضایی، اصفهان</cite>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; ۱۴۰۳ - تمام حقوق برای فروشگاه عود آرامش محفوظ است.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

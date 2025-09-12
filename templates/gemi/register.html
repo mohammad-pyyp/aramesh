@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ثبت نام با Vue.js - فروشگاه عود آرامش</title>
+    <style>
+        /* --- Import Font --- */
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+
+        /* --- General Styles --- */
+        :root {
+            --bg-color: #1a202c;
+            /* پس زمینه تیره */
+            --card-bg-color: #2d3748;
+            /* پس زمینه کارت ها */
+            --primary-text-color: #edf2f7;
+            /* رنگ متن اصلی */
+            --secondary-text-color: #a0aec0;
+            /* رنگ متن ثانویه */
+            --accent-color: #d69e2e;
+            /* رنگ طلایی برای دکمه ها و تاکید */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: var(--bg-color);
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232a313e' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            color: var(--primary-text-color);
+            line-height: 1.8;
+            text-align: right;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(26, 32, 44, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo a {
+            text-decoration: none;
+            color: var(--primary-text-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-button {
+            text-decoration: none;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 400;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .login-btn {
+            color: var(--primary-text-color);
+            border-color: var(--secondary-text-color);
+        }
+
+        .login-btn:hover {
+            background-color: var(--secondary-text-color);
+            color: var(--bg-color);
+        }
+
+        .signup-btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border-color: var(--accent-color);
+        }
+
+        .signup-btn:hover {
+            background-color: #b88625;
+            border-color: #b88625;
+        }
+
+        /* --- CTA Button --- */
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 15px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #b88625;
+            transform: translateY(-3px);
+        }
+
+        /* --- Footer --- */
+        footer {
+            text-align: center;
+            padding: 30px;
+            background-color: var(--card-bg-color);
+            color: var(--secondary-text-color);
+        }
+
+        /* --- Registration Form --- */
+        .form-section {
+            padding: 120px 20px 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-container {
+            background-color: var(--card-bg-color);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .form-container h2 {
+            font-size: 2rem;
+            color: var(--primary-text-color);
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid #4a5568;
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .input-group input::placeholder {
+            color: #718096;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(214, 158, 46, 0.3);
+        }
+
+        .phone-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .phone-wrapper input {
+            flex-grow: 1;
+        }
+
+        .send-otp-btn {
+            padding: 12px 15px;
+            border: 1px solid var(--secondary-text-color);
+            background-color: transparent;
+            color: var(--secondary-text-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Vazirmatn', sans-serif;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .send-otp-btn:hover:not(:disabled) {
+            background-color: var(--secondary-text-color);
+            color: var(--bg-color);
+        }
+
+        .send-otp-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        #otp-inputs {
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row-reverse;
+            gap: 10px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            background-color: var(--bg-color);
+            color: var(--primary-text-color);
+            -moz-appearance: textfield;
+        }
+
+        .otp-input::-webkit-outer-spin-button,
+        .otp-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(214, 158, 46, 0.3);
+        }
+
+        .form-container .cta-button {
+            width: 100%;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .form-container .form-link {
+            margin-top: 25px;
+            font-size: 0.9rem;
+            color: var(--secondary-text-color);
+        }
+
+        .form-container .form-link a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .logo a {
+                font-size: 1.2rem;
+            }
+
+            .nav-button {
+                padding: 6px 14px;
+                font-size: 0.8rem;
+            }
+
+            .form-container h2 {
+                font-size: 1.5rem;
+            }
+
+            .otp-input {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="app" v-cloak>
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="container nav-container">
+                <div class="logo">
+                    <a href="index.html">عود آرامش</a>
+                </div>
+                <div class="nav-links">
+                    <a href="#" class="nav-button login-btn">ورود</a>
+                    <a href="#" class="nav-button signup-btn">ثبت نام</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Registration Form Section -->
+        <main class="form-section">
+            <div class="form-container">
+                <h2>ایجاد حساب کاربری</h2>
+                <form @submit.prevent="handleSubmit">
+                    <div class="input-group">
+                        <label for="first-name">نام</label>
+                        <input type="text" id="first-name" v-model="form.firstName" placeholder="نام خود را وارد کنید"
+                            required>
+                    </div>
+                    <div class="input-group">
+                        <label for="last-name">نام خانوادگی</label>
+                        <input type="text" id="last-name" v-model="form.lastName"
+                            placeholder="نام خانوادگی خود را وارد کنید" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="phone">شماره تلفن</label>
+                        <div class="phone-wrapper">
+                            <input type="tel" id="phone" v-model="form.phone" placeholder="مثال: 09123456789" required>
+                            <button type="button" class="send-otp-btn" @click="sendOtp" :disabled="isOtpButtonDisabled">
+                                {{ otpButtonText }}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="input-group" v-if="isOtpVisible">
+                        <label for="otp-1">کد تایید (OTP)</label>
+                        <div id="otp-inputs" ref="otpContainer">
+                            <input v-for="(input, index) in otp" :key="index" type="text" class="otp-input"
+                                maxlength="1" inputmode="numeric" v-model="otp[index]"
+                                @input="handleOtpInput($event, index)" @keydown="handleOtpKeydown($event, index)"
+                                @paste="handleOtpPaste" :ref="el => { if (el) otpInputRefs[index] = el }">
+                        </div>
+                    </div>
+                    <button type="submit" class="cta-button">ثبت نام</button>
+                </form>
+                <p class="form-link">
+                    حساب کاربری دارید؟ <a href="#">وارد شوید</a>
+                </p>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <div class="container">
+                <p>&copy; ۱۴۰۳ - تمام حقوق برای فروشگاه عود آرامش محفوظ است.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Vue 3 CDN -->
+    <script type="importmap">
+        { "imports": { "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js" } }
+    </script>
+
+    <script type="module">
+        import { createApp, ref, computed, nextTick, onBeforeUpdate } from 'vue';
+
+        createApp({
+            setup() {
+                // Form State
+                const form = ref({
+                    firstName: '',
+                    lastName: '',
+                    phone: ''
+                });
+                const otp = ref(new Array(6).fill(''));
+
+                // UI State
+                const isOtpVisible = ref(false);
+                const isOtpButtonDisabled = ref(false);
+                const countdown = ref(60);
+                const otpInputRefs = ref([]);
+
+                // Computed Properties
+                const fullOtp = computed(() => otp.value.join(''));
+                const otpButtonText = computed(() => {
+                    return isOtpButtonDisabled.value ? `ارسال مجدد (${countdown.value})` : 'ارسال کد';
+                });
+
+                // Methods
+                const sendOtp = () => {
+                    if (form.value.phone.trim() === '') {
+                        alert('لطفا ابتدا شماره تلفن خود را وارد کنید.');
+                        return;
+                    }
+
+                    console.log('Sending OTP to:', form.value.phone);
+
+                    isOtpVisible.value = true;
+                    isOtpButtonDisabled.value = true;
+
+                    nextTick(() => {
+                        otpInputRefs.value[0]?.focus();
+                    });
+
+                    const interval = setInterval(() => {
+                        countdown.value--;
+                        if (countdown.value <= 0) {
+                            clearInterval(interval);
+                            isOtpButtonDisabled.value = false;
+                            countdown.value = 60;
+                        }
+                    }, 1000);
+                };
+
+                const handleOtpInput = (e, index) => {
+                    const value = e.target.value;
+                    if (isNaN(value)) {
+                        otp.value[index] = '';
+                        return;
+                    }
+
+                    if (value && index < 5) {
+                        otpInputRefs.value[index + 1]?.focus();
+                    }
+                };
+
+                const handleOtpKeydown = (e, index) => {
+                    if (e.key === 'Backspace' && otp.value[index] === '' && index > 0) {
+                        otpInputRefs.value[index - 1]?.focus();
+                    }
+                };
+
+                const handleOtpPaste = (e) => {
+                    e.preventDefault();
+                    const text = e.clipboardData.getData('text').trim();
+                    if (/^\d{6}$/.test(text)) {
+                        otp.value = text.split('');
+                        otpInputRefs.value[5]?.focus();
+                    }
+                };
+
+                const handleSubmit = () => {
+                    console.log('Form Submitted:', form.value);
+                    console.log('Full OTP:', fullOtp.value);
+                    if (fullOtp.value.length === 6) {
+                        alert(`فرم ثبت نام ارسال شد!\nنام: ${form.value.firstName}\nتلفن: ${form.value.phone}\nکد: ${fullOtp.value}`);
+                    } else {
+                        alert('کد تایید باید ۶ رقمی باشد.');
+                    }
+                };
+
+                onBeforeUpdate(() => {
+                    otpInputRefs.value = [];
+                });
+
+
+                return {
+                    form,
+                    otp,
+                    isOtpVisible,
+                    isOtpButtonDisabled,
+                    otpButtonText,
+                    otpInputRefs,
+                    sendOtp,
+                    handleOtpInput,
+                    handleOtpKeydown,
+                    handleOtpPaste,
+                    handleSubmit,
+                };
+            }
+        }).mount('#app');
+    </script>
+
+</body>
+
+</html>
