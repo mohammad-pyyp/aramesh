@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from .models import Appointment
 from .serializers import AppointmentSerializer, AppointmentCreateSerializer
 
+from django.contrib.auth.decorators import login_required 
+
 # Create your views here.
 
 def welcome_page(request):
@@ -16,6 +18,7 @@ def coming_soon(request):
     """Render the coming soon page"""
     return render(request, 'comming_soon.html')
 
+@login_required
 def user_dashboard(request):
     """Render the user dashboard page"""
     return render(request, 'user_dashboard.html')

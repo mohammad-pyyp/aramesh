@@ -625,7 +625,8 @@
 
                             <div v-if="ap.status==='canceled'" class="details">
                                 این نوبت لغو شده است.
-                                <div class="muted" style="margin-top:6px">علت لغو: [[ ap.reason || 'عدم تکمیل اطلاعات تماس' ]]</div>
+                                <div class="muted" style="margin-top:6px">علت لغو: [[ ap.reason || 'عدم تکمیل اطلاعات
+                                    تماس' ]]</div>
                             </div>
                         </div>
                     </article>
@@ -703,8 +704,8 @@
     </div>
 
 
-    <!-- JWT Client Script -->
-    <script src="{% static 'js/jwt-client.js' %}"></script>
+    <!-- Client Script -->
+    <!-- <script src="{% static 'js/jwt-client.js' %}"></script> -->
     <script src="{% static 'js/pkgs/vue.global.prod.js' %}"></script>
 
     <script defer>

@@ -6,16 +6,16 @@ from core.views import AppointmentListView, AppointmentCreateView
 app_name = "api"
 
 urlpatterns = [
-    # Authentication endpoints
-    path("send-otp/", SendOTPView.as_view(), name="send_otp"),
-    path("register/", RegisterView.as_view(), name="register"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("logout/", LogoutView.as_view(), name="logout"),
-
     # User profile
     path("dashboard/", DashboardView.as_view(), name="dashboard"),
     path("profile/", UserProfileUpdateView.as_view(), name="profile_update"),
     
+    # API views
+    path("send-otp/", SendOTPView.as_view(), name="send_otp"),
+    path("register/", RegisterView.as_view(), name="api_register"),
+    path("login/", LoginView.as_view(), name="api_login"),
+    path("logout/", LogoutView.as_view(), name="api_logout"),
+
     # Appointments
     path("appointments/", AppointmentListView.as_view(), name="appointments_list"),
     path("appointments/create/", AppointmentCreateView.as_view(), name="appointments_create"),

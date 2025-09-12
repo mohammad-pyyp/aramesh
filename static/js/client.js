@@ -12,17 +12,17 @@ class SessionClient {
 
     // --- OTP ---
     async sendOTP(phone, mode = "register") {
-        const { data } = await this.api.post("/send-otp/", { phone, mode });
+        const { data } = await this.api.post("/send-otp/", { phone });
         return data;
     }
 
     // --- ثبت‌نام ---
-    async register(phone, otp, firstName = "", lastName = "") {
+    async register(firstName = "", lastName = "", phone, otp) {
         const { data } = await this.api.post("/register/", {
-            phone,
-            otp,
             first_name: firstName,
             last_name: lastName,
+            phone,
+            otp,
         });
         // می‌تونی user رو تو localStorage ذخیره کنی (بدون توکن)
         localStorage.setItem("user", JSON.stringify(data.data.user));

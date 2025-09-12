@@ -9,17 +9,15 @@ PHONE_REGEX = r'^09\d{9}$'  # هم‌خوان با validator مدل User
 
 class SendOTPSerializer(serializers.Serializer):
     phone = serializers.RegexField(regex=PHONE_REGEX, max_length=11, help_text="شماره باید 11 رقم و با 09 شروع شود")
-    mode = serializers.ChoiceField(choices=(('register', 'register'), ('login', 'login')),
-                                   default='register', required=False)
 
     def validate_phone(self, value):
         return value.strip()
 
 
 class RegisterSerializer(serializers.Serializer):
-    phone = serializers.RegexField(regex=PHONE_REGEX, max_length=11)
     first_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
     last_name = serializers.CharField(max_length=30, required=False, allow_blank=True)
+    phone = serializers.RegexField(regex=PHONE_REGEX, max_length=11)
     otp = serializers.CharField(min_length=6, max_length=6)
 
     # validate_first_name(){}
