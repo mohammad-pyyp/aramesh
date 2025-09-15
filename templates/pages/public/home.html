@@ -303,16 +303,17 @@
                 <a href="#">عود آرامش</a>
             </div>
 
-            {% if user.is_authinticated%}
-            <div class="nav-links">
-                <a href="{% url 'pages:login' %}" class="nav-button login-btn">ورود</a>
-                <a href="{% url 'pages:register' %}" class="nav-button signup-btn">ثبت نام</a>
-            </div>
-            {% else %}
+            {% if user.is_authenticated %}
+            {{ user.username }}
             <div class="nav-links">
                 <a href="{% url 'pages:logout' %}" class="nav-button login-btn">خروج</a>
                 <a href="{% url 'pages:comming_soon' %}" class="nav-button signup-btn">فرشگاه</a>
                 <a href="{% url 'pages:dashboard' %}" class="nav-button signup-btn">داشبورد کاربری</a>
+            </div>
+            {% else %}
+            <div class="nav-links">
+                <a href="{% url 'pages:login' %}" class="nav-button login-btn">ورود</a>
+                <a href="{% url 'pages:register' %}" class="nav-button signup-btn">ثبت نام</a>
             </div>
             {% endif %}
 
