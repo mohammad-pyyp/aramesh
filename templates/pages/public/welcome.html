@@ -302,11 +302,15 @@
             <div class="logo">
                 <a href="#">عود آرامش</a>
             </div>
+
+            {% if user.is_authinticated%}
             <div class="nav-links">
                 <!-- لینک های ورود و ثبت نام را اینجا قرار دهید -->
                 <a href="#" class="nav-button login-btn">ورود</a>
                 <a href="#" class="nav-button signup-btn">ثبت نام</a>
             </div>
+            {% endif %}
+
         </div>
     </nav>
 

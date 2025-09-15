@@ -6,19 +6,18 @@ from .mixins import CustomLoginRequiredMixin , AdminRequiredMixin
 
 
 class WelcomePage(PageView):
-    # template_name = 'welcome_page.html'
-    template_name = 'gemi/welcome.html'
+    template_name = 'pages/welcome.html'
 
 
 class LoginPage(PageView):
-    template_name = 'pages/user/login.html'
+    template_name = 'pages/login.html'
 
 class RegisterPage(PageView):
-    template_name = 'pages/user/register.html'
+    template_name = 'pages/register.html'
 
 
 class ComingSoonPage(PageView):
-    template_name = 'pages/user/comming_soon.html'
+    template_name = 'pages/comming_soon.html'
 
 
 # @login_required
