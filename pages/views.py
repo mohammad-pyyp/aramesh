@@ -5,15 +5,18 @@ from django.contrib.auth import  logout
 from .mixins import CustomLoginRequiredMixin , AdminRequiredMixin
 
 
-class WelcomePage(PageView):
-    template_name = 'pages/welcome.html'
+class CommingSoon(PageView):
+    template_name = 'comming_soon.html'
+
+class HomePage(PageView):
+    template_name = 'pages/public/home.html'
 
 
 class LoginPage(PageView):
-    template_name = 'pages/login.html'
+    template_name = 'pages/user/login.html'
 
 class RegisterPage(PageView):
-    template_name = 'pages/register.html'
+    template_name = 'pages/user/register.html'
 
 
 class ComingSoonPage(PageView):
@@ -22,13 +25,14 @@ class ComingSoonPage(PageView):
 
 # @login_required
 class DashboardPage(PageView):
-    template_name = 'pages/user/user_dashboard.html'
+    template_name = 'pages/user/dashboard.html'
+
 
 class AppointmentsPage(PageView):
-    template_name = 'management/management_appointments.html'
+    template_name = 'pages/admin/appointments.html'
 
 
 def logout_view(request):
     logout(request)
-    redirect('page:welcome') 
+    return redirect('pages:home') 
 
