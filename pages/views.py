@@ -18,14 +18,14 @@ def logout_view(request):
     return redirect('pages:home') 
 
 
-# ------------------ User ------------------
 class LoginPage(PageView):
-    template_name = 'pages/user/auth/login.html'
+    template_name = 'pages/public/user/auth/login.html'
 
 
 class RegisterPage(PageView):
-    template_name = 'pages/user/auth/register.html'
+    template_name = 'pages/public/user/auth/register.html'
 
+# ------------------ User ------------------
 
 class DashboardPage(PageView):
     template_name = 'pages/user/dashboard.html'
