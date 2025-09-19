@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
-from .models import User , OTP
+from .models import User 
 
 admin.site.register(User)
-admin.site.register(OTP)
+# admin.site.register(OTP)
 
 
 # @admin.register(User)

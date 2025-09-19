@@ -44,18 +44,21 @@ CSRF_TRUSTED_ORIGINS = [
 
 
 MIDDLEWARE = [
-
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     # corsheaders
     "corsheaders.middleware.CorsMiddleware",
-
+    'django.middleware.locale.LocaleMiddleware', 
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -103,12 +106,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 
-LANGUAGE_CODE = 'fa-ir'
+LANGUAGE_CODE = 'fa'
 
 TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
-
+USE_L10N = True
 USE_TZ = True
 
 
@@ -141,3 +144,8 @@ REST_FRAMEWORK = {
         # 'user': '1000/day',
     # }
 }
+
+
+
+LOGIN_REDIRECT_URL = 'pages:home'  # The 'name' of the URL to go to after login
+LOGOUT_REDIRECT_URL = 'pages:home' # The 'name' of the URL to go to after logout

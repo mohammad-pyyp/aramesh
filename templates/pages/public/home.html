@@ -304,7 +304,7 @@
             </div>
 
             {% if user.is_authenticated %}
-            {{ user.username }}
+            {{ user.full_name }}
             <div class="nav-links">
                 <a href="{% url 'pages:logout' %}" class="nav-button login-btn">خروج</a>
                 <a href="{% url 'pages:comming_soon' %}" class="nav-button signup-btn">فرشگاه</a>
