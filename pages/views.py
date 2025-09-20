@@ -61,10 +61,21 @@ class LoginPage(PageView):
     template_name = 'pages/public/user/auth/login.html'
 
 
-# ------------------ User ------------------
+# ------------------ User And Admin ------------------
 
-class DashboardPage(PageView):
+
+class DashboardPage(CustomLoginRequiredMixin,PageView):
     template_name = 'pages/user/dashboard.html'
+    user_template_name = 'pages/user/dashboard.html'
+    admin_template_name = 'pages/admin/dashboard.html'
+
+    def get_template_names(self):
+        if self.request.user.is_superuser:
+            return [self.admin_template_name]
+        elif self.request.user.is_authenticated:
+            return [self.user_template_name]
+        else:
+            return ['pages/user/dashboard.html']
 
 
 # ------------------ Admin ------------------

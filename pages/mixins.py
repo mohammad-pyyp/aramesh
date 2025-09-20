@@ -16,7 +16,6 @@ class AdminRequiredMixin(UserPassesTestMixin):
 
 class CustomLoginRequiredMixin(LoginRequiredMixin):
     login_url = "pages:login"
-    redirect_field_name = None
 
 
 class AnonymousRequiredMixin:

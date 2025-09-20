@@ -1,18 +1,15 @@
 # accounts/views.py
 import logging
-from django.db import IntegrityError, transaction
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.views import APIView
-# from .models import OTP
-from .serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
+from rest_framework.generics import ListCreateAPIView
+from .serializers import AppointmentSerializer
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import render
 from django.contrib.auth import login
 from .models import Appointment
-from .serializers import AppointmentSerializer, AppointmentCreateSerializer
 
 
 User = get_user_model()
@@ -26,6 +23,23 @@ def success_response(message="ok", data=None, status_code=status.HTTP_200_OK):
 
 def error_response(message, status_code=status.HTTP_400_BAD_REQUEST, data=None):
     return Response({"success": False, "message": message, "data": data or {}}, status=status_code)
+
+
+
+class UserAppointmentAPIView(ListCreateAPIView):
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Appointment.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+
+
+
 
 
 # class RegisterView(APIView):
@@ -134,64 +148,30 @@ def error_response(message, status_code=status.HTTP_400_BAD_REQUEST, data=None):
 #         })
 
 
-class DashboardView(APIView):
-    permission_classes = [IsAuthenticated]
+# class DashboardView(APIView):
+#     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        serializer = ProfileSerializer(request.user)
-        return success_response("پروفایل کاربر", data=serializer.data)
+#     def get(self, request):
+#         serializer = ProfileSerializer(request.user)
+#         return success_response("پروفایل کاربر", data=serializer.data)
 
 
-class UserProfileUpdateView(APIView):
-    """Update user profile"""
-    permission_classes = [IsAuthenticated]
+# class UserProfileUpdateView(APIView):
+#     """Update user profile"""
+#     permission_classes = [IsAuthenticated]
     
-    def patch(self, request):
-        serializer = ProfileSerializer(request.user, data=request.data, partial=True)
+#     def patch(self, request):
+#         serializer = ProfileSerializer(request.user, data=request.data, partial=True)
         
-        if serializer.is_valid():
-            serializer.save()
-            return success_response("پروفایل با موفقیت به‌روزرسانی شد", data=serializer.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return success_response("پروفایل با موفقیت به‌روزرسانی شد", data=serializer.data)
         
-        return error_response("داده‌های نامعتبر", data=serializer.errors)
+#         return error_response("داده‌های نامعتبر", data=serializer.errors)
 
 
 
 
-# API Views
-class AppointmentListView(APIView):
-    """Get user's appointments"""
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-        appointments = Appointment.objects.filter(user=request.user)
-        serializer = AppointmentSerializer(appointments, many=True)
-        return Response({
-            "success": True,
-            "message": "نوبت‌های کاربر",
-            "data": serializer.data
-        })
 
-class AppointmentCreateView(APIView):
-    """Create a new appointment"""
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        serializer = AppointmentCreateSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            appointment = serializer.save()
-            response_serializer = AppointmentSerializer(appointment)
-            return Response({
-                "success": True,
-                "message": "نوبت با موفقیت ثبت شد",
-                "data": response_serializer.data
-            }, status=status.HTTP_201_CREATED)
-        return Response({
-            "success": False,
-            "message": "خطا در ثبت نوبت",
-            "data": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    
 
 

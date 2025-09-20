@@ -51,7 +51,6 @@
             transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
         }
 
-        /* ---------- بقیه استایل‌ها ---------- */
         body {
             font-family: 'Vazir', sans-serif;
             margin: 0;
@@ -88,7 +87,6 @@
             font-size: 18px;
         }
 
-        /* دکمه تغییر تم */
         .theme-toggle {
             background: var(--card);
             color: var(--text);
@@ -101,8 +99,6 @@
             justify-content: center;
             cursor: pointer;
             transition: all 900ms;
-
-            /* حذف هایلایت موبایل */
             -webkit-tap-highlight-color: transparent;
             outline: none;
         }
@@ -126,12 +122,6 @@
             stroke-width: 2;
         }
 
-        a {
-            color: inherit;
-            text-decoration: none
-        }
-
-        /* Burger button */
         .burger {
             background: var(--card);
             position: relative;
@@ -146,7 +136,6 @@
             justify-content: center;
             transition: transform .2s ease;
         }
-
 
         .burger:active {
             transform: scale(.98)
@@ -186,7 +175,6 @@
             top: 21px;
             transform: rotate(-45deg)
         }
-
 
         .menu-overlay {
             position: fixed;
@@ -390,7 +378,6 @@
             animation: spin .8s linear infinite;
         }
 
-
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -402,7 +389,6 @@
             border: 1px dashed var(--border);
             border-radius: 10px;
             background: var(--bg2);
-            /* خاکستری تیره */
             border-color: var(--border);
         }
 
@@ -413,125 +399,6 @@
 
         .muted {
             color: var(--muted)
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-        }
-
-        .modal {
-            background: var(--bg2);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--muted);
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background-color 0.2s;
-        }
-
-        .modal-close:hover {
-            background: var(--card);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            background: var(--bg);
-            color: var(--text);
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-            margin-top: 2rem;
-        }
-
-        .btn-secondary {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
         }
     </style>
 </head>
@@ -548,7 +415,7 @@
                         <span class="line l2"></span>
                         <span class="line l3"></span>
                     </button>
-                    <div class="title" v-text="userName"></div>
+                    <div class="title">{{request.user.full_name}}</div>
 
                 </div>
                 <button class="theme-toggle" @click="toggleTheme"
@@ -583,297 +450,106 @@
                     <a class="menu-item" href="#" @click="menuOpen = false">نوبت‌های من</a>
                     <a class="menu-item" href="#" @click="menuOpen = false">رزرو نوبت جدید</a>
                     <a class="menu-item" href="#" @click="menuOpen = false">تنظیمات</a>
-                    <a class="menu-item" href="#" @click="logout(); menuOpen = false">خروج</a>
+                    <a class="menu-item" href="#">خروج</a>
                 </div>
             </nav>
         </div>
 
         <main class="container">
-            <!-- Loading State -->
             <div v-if="isLoading" style="text-align: center; padding: 2rem;">
-                <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto;"></div>
-                <p class="muted" style="margin-top: 1rem;">در حال بارگذاری...</p>
+                <p>در حال بارگذاری نوبت‌ها...</p>
             </div>
-
-            <!-- Main Content -->
+            <div v-else-if="error" style="text-align: center; padding: 2rem; color: #f87171;">
+                <p>{{ error }}</p>
+            </div>
             <div v-else>
                 <section class="cta">
-                    <button @click="addAppointment" class="btn-primary" :disabled="hasPending">رزرو نوبت</button>
-                    <div class="muted" aria-live="polite" v-text="liveMessage"></div>
+                    <button class="btn-primary" :disabled="hasPending"
+                        @click="createAppointment('{{request.user.pk}}')">رزرو
+                        نوبت جدید</button>
+                    <div class="muted" v-if="hasPending">شما یک نوبت در حال بررسی دارید.</div>
                 </section>
 
                 <div class="cards">
                     <article v-for="ap in appointments" :key="ap.id" class="card" :class="'status--' + ap.status">
                         <div class="card-head">
-                            <div class="card-title">+ نوبت</div>
+                            <div class="card-title">درخواست نوبت</div>
                             <div class="badge">
-                                <span>[[ getStatusMeta(ap.status).label ]]</span>
+                                <span>{{ ap.status_display }}</span>
                             </div>
                         </div>
                         <div class="card-body">
-                            <div v-if="ap.status==='pending'" class="status-loading">
-                                <span> نوبت شما برای بررسی ارسال شد </span>
-                                <span class="spinner"></span>
+                            <div v-if="ap.status === 'pending'" class="details">
+                                <p style="margin-top: 10px;">نوبت شما پس از بررسی توسط ادمین تایید خواهد شد.</p>
                             </div>
 
-                            <div v-if="ap.status==='approved'" class="details">
-                                <div class="pair"><b>تاریخ:</b> <span>[[ ap.details?.date ]]</span></div>
-                                <div class="pair"><b>ساعت:</b> <span>[[ ap.details?.time ]]</span></div>
-                                <div v-if="ap.details?.service" class="pair"><b>خدمت:</b> <span>[[ ap.details?.service
-                                        ]]</span></div>
+                            <div v-if="ap.status === 'approved'" class="details">
+                                <div class="pair"><b>تاریخ تایید شده:</b> <span>{{ ap.confirmed_date }}</span></div>
+                                <div class="pair"><b>ساعت تایید شده:</b> <span>{{ ap.confirmed_time }}</span></div>
                             </div>
 
-                            <div v-if="ap.status==='canceled'" class="details">
-                                این نوبت لغو شده است.
-                                <div class="muted" style="margin-top:6px">علت لغو: [[ ap.reason || 'عدم تکمیل اطلاعات
-                                    تماس' ]]</div>
+                            <div v-if="ap.status === 'canceled'" class="details">
+                                <p>این نوبت لغو شده است.</p>
+                                <div v-if="ap.cancellation_reason" class="muted" style="margin-top:6px">
+                                    <b>علت:</b> {{ ap.cancellation_reason }}
+                                </div>
                             </div>
                         </div>
                     </article>
 
-                    <!-- Empty State -->
                     <div v-if="appointments.length === 0" class="card" style="text-align: center; padding: 2rem;">
-                        <div class="muted">هنوز نوبتی ثبت نکرده‌اید</div>
-                        <button @click="addAppointment" class="btn-primary" style="margin-top: 1rem;">اولین نوبت خود را
-                            رزرو کنید</button>
+                        <div class="muted">هنوز نوبتی ثبت نکرده‌اید.</div>
+                        <button class="btn-primary" style="margin-top: 1rem;">اولین نوبت خود را رزرو کنید</button>
                     </div>
                 </div>
             </div>
         </main>
-
-        <!-- Booking Modal -->
-        <div v-if="showBookingModal" class="modal-overlay" @click.self="showBookingModal = false">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3>رزرو نوبت جدید</h3>
-                    <button @click="showBookingModal = false" class="modal-close">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form @submit.prevent="submitBooking">
-                        <div class="form-group">
-                            <label>نوع خدمت:</label>
-                            <select v-model="bookingForm.service" required>
-                                <option value="">انتخاب کنید</option>
-                                <option value="مشاوره">مشاوره</option>
-                                <option value="معاینه">معاینه</option>
-                                <option value="درمان">درمان</option>
-                                <option value="پیگیری">پیگیری</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>تاریخ مورد نظر:</label>
-                            <input type="date" v-model="bookingForm.preferredDate" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label>ساعت مورد نظر:</label>
-                            <select v-model="bookingForm.preferredTime" required>
-                                <option value="">انتخاب کنید</option>
-                                <option value="08:00">08:00</option>
-                                <option value="09:00">09:00</option>
-                                <option value="10:00">10:00</option>
-                                <option value="11:00">11:00</option>
-                                <option value="12:00">12:00</option>
-                                <option value="14:00">14:00</option>
-                                <option value="15:00">15:00</option>
-                                <option value="16:00">16:00</option>
-                                <option value="17:00">17:00</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>توضیحات اضافی:</label>
-                            <textarea v-model="bookingForm.notes" rows="3"
-                                placeholder="توضیحات اضافی (اختیاری)"></textarea>
-                        </div>
-
-                        <div class="modal-actions">
-                            <button type="button" @click="showBookingModal = false"
-                                class="btn-secondary">انصراف</button>
-                            <button type="submit" class="btn-primary" :disabled="isLoading">
-                                <span v-if="isLoading" class="spinner"
-                                    style="width: 16px; height: 16px; margin-left: 8px;"></span>
-                                ثبت نوبت
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
-
-    <!-- Client Script -->
-    <!-- <script src="{% static 'js/jwt-client.js' %}"></script> -->
     <script src="{% static 'js/pkgs/vue.global.prod.js' %}"></script>
+    <script src="{% static 'js/pkgs/axios.min.js' %}"></script>
+    <script>
+        axios.defaults.headers.common['X-CSRFToken'] = '{{ csrf_token }}';
+    </script>
 
-    <script defer>
+    <script>
         window.addEventListener('DOMContentLoaded', () => {
             const { createApp } = Vue;
-
             createApp({
                 delimiters: ['[[', ']]'],
                 data() {
                     return {
-                        userName: 'کاربر',
-                        userProfile: null,
                         menuOpen: false,
-                        appointments: [],
-                        liveMessage: '',
                         theme: 'dark',
-                        isLoading: true,
-                        isAuthenticated: false,
-                        showBookingModal: false,
-                        bookingForm: {
-                            service: '',
-                            preferredDate: '',
-                            preferredTime: '',
-                            notes: ''
-                        }
+                        appointments: [],
                     };
                 },
                 computed: {
                     hasPending() {
-                        return this.appointments.some(a => a.status === 'pending');
+                        return this.appointments.some(ap => ap.status === 'pending');
                     }
                 },
                 methods: {
-                    async init() {
+                    async fetchUserAppointments() {
                         try {
-                            await this.checkAuthentication();
-                            if (this.isAuthenticated) {
-                                await this.loadUserProfile();
-                                await this.loadAppointments();
-                            } else {
-                                this.redirectToLogin();
-                            }
-                        } catch (error) {
-                            console.error('Initialization error:', error);
-                            this.liveMessage = 'خطا در بارگذاری اطلاعات';
+                            const response = await axios.get('/api/appointments/');
+                            this.appointments = response.data;
+                        } catch (err) {
+                            console.error("خطا در دریافت نوبت‌ها:", err);
+                            error.value = "خطا در اتصال به سرور. لطفاً دوباره تلاش کنید.";
                         } finally {
-                            this.isLoading = false;
+                            // isLoading.value = false;
                         }
                     },
-
-                    async checkAuthentication() {
+                    async createAppointment(user_id) {
                         try {
-                            const jwtClient = window.jwtClient;
-                            if (jwtClient && jwtClient.isAuthenticated()) {
-                                this.isAuthenticated = true;
-                            }
-                        } catch (error) {
-                            console.error('Auth check failed:', error);
-                            this.isAuthenticated = false;
+                            const response = await axios.post('/api/appointments/', { user_id: user_id, });
+                            this.fetchUserAppointments()
+                        } catch (err) {
+                            console.error("خطا در ایجاد نوبت:", err.response?.data || err);
+                            alert(err.response?.data?.detail || "امکان رزرو وجود ندارد.");
                         }
                     },
-
-                    async loadUserProfile() {
-                        try {
-                            const jwtClient = window.jwtClient;
-                            const response = await jwtClient.getProfile();
-                            if (response.success) {
-                                this.userProfile = response.data;
-                                this.userName = `${response.data.first_name} ${response.data.last_name}` || 'کاربر';
-                            }
-                        } catch (error) {
-                            console.error('Profile load failed:', error);
-                            this.liveMessage = 'خطا در بارگذاری پروفایل';
-                        }
-                    },
-
-                    async loadAppointments() {
-                        try {
-                            const jwtClient = window.jwtClient;
-                            const response = await jwtClient.apiRequest('/appointments/');
-                            const data = await response.json();
-
-                            if (data.success) {
-                                this.appointments = data.data.map(apt => ({
-                                    id: apt.id,
-                                    status: apt.status,
-                                    details: apt.status === 'approved' ? {
-                                        service: apt.service,
-                                        date: apt.confirmed_date || apt.preferred_date,
-                                        time: apt.confirmed_time || apt.preferred_time
-                                    } : null,
-                                    reason: apt.cancellation_reason
-                                }));
-                            } else {
-                                this.liveMessage = 'خطا در بارگذاری نوبت‌ها';
-                            }
-                        } catch (error) {
-                            console.error('Appointments load failed:', error);
-                            this.liveMessage = 'خطا در بارگذاری نوبت‌ها';
-                        }
-                    },
-
-                    async addAppointment() {
-                        if (this.hasPending) {
-                            this.liveMessage = 'یک نوبت در حال بررسی دارید';
-                            return;
-                        }
-
-                        this.showBookingModal = true;
-                    },
-
-                    async submitBooking() {
-                        try {
-                            this.isLoading = true;
-
-                            const jwtClient = window.jwtClient;
-                            const response = await jwtClient.apiRequest('/appointments/create/', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(this.bookingForm)
-                            });
-
-                            const data = await response.json();
-
-                            if (data.success) {
-                                // Reload appointments to get the new one
-                                await this.loadAppointments();
-                                this.showBookingModal = false;
-                                this.liveMessage = 'نوبت شما با موفقیت ثبت شد و به زودی تایید خواهد شد';
-
-                                // Reset form
-                                this.bookingForm = {
-                                    service: '',
-                                    preferredDate: '',
-                                    preferredTime: '',
-                                    notes: ''
-                                };
-                            } else {
-                                this.liveMessage = data.message || 'خطا در ثبت نوبت';
-                            }
-
-                        } catch (error) {
-                            console.error('Booking failed:', error);
-                            this.liveMessage = 'خطا در ثبت نوبت';
-                        } finally {
-                            this.isLoading = false;
-                        }
-                    },
-
-                    async logout() {
-                        try {
-                            const jwtClient = window.jwtClient;
-                            if (jwtClient) {
-                                await jwtClient.logout();
-                            }
-                            this.redirectToLogin();
-                        } catch (error) {
-                            console.error('Logout failed:', error);
-                            this.redirectToLogin();
-                        }
-                    },
-
-                    redirectToLogin() {
-                        window.location.href = '/accounts/sing-in/';
-                    },
-
                     toggleMenu() {
                         this.menuOpen = !this.menuOpen;
                     },
@@ -898,9 +574,10 @@
                         document.documentElement.setAttribute('data-theme', this.theme);
                     }
                 },
+
                 mounted() {
                     this.loadTheme();
-                    this.init();
+                    this.fetchUserAppointments();
                 }
             }).mount('#app');
         });
